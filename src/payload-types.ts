@@ -69,6 +69,18 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    companies: Company;
+    employees: Employee;
+    'payroll-requests': PayrollRequest;
+    payslips: Payslip;
+    'audit-log': AuditLog;
+    tickets: Ticket;
+    'ticket-messages': TicketMessage;
+    notifications: Notification;
+    'notification-recipients': NotificationRecipient;
+    'contact-us': ContactUs;
+    exports: Export;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,21 +89,39 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    companies: CompaniesSelect<false> | CompaniesSelect<true>;
+    employees: EmployeesSelect<false> | EmployeesSelect<true>;
+    'payroll-requests': PayrollRequestsSelect<false> | PayrollRequestsSelect<true>;
+    payslips: PayslipsSelect<false> | PayslipsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    tickets: TicketsSelect<false> | TicketsSelect<true>;
+    'ticket-messages': TicketMessagesSelect<false> | TicketMessagesSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    'notification-recipients': NotificationRecipientsSelect<false> | NotificationRecipientsSelect<true>;
+    'contact-us': ContactUsSelect<false> | ContactUsSelect<true>;
+    exports: ExportsSelect<false> | ExportsSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   globals: {};
   globalsSelect: {};
-  locale: null;
+  locale: 'en';
   user: User & {
     collection: 'users';
   };
   jobs: {
-    tasks: unknown;
+    tasks: {
+      createCollectionExport: TaskCreateCollectionExport;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
@@ -118,7 +148,14 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  role: 'super admin' | 'employer';
+  /**
+   * The company this user belongs to
+   */
+  company?: (number | null) | Company;
+  firstName?: string | null;
+  lastName?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -139,10 +176,91 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companies".
+ */
+export interface Company {
+  id: number;
+  /**
+   * Official registered company name
+   */
+  companyLegalName: string;
+  region:
+    | 'riyadh'
+    | 'jeddah'
+    | 'dammam_khobar'
+    | 'medina'
+    | 'makkah'
+    | 'abha'
+    | 'hail'
+    | 'tabuk'
+    | 'jazan'
+    | 'other_saudi';
+  industry:
+    | 'ict_software'
+    | 'industrial_manufacturing'
+    | 'retail_ecommerce'
+    | 'financial_services'
+    | 'logistics_transportation'
+    | 'education_training'
+    | 'healthcare'
+    | 'construction_realestate'
+    | 'hospitality_tourism'
+    | 'government'
+    | 'other';
+  companySize: '0_10' | '5_25' | '25_50' | '50_100' | '100_500' | '500_1000' | '1000_plus';
+  primaryContactName: string;
+  /**
+   * Business email address only (no free email domains)
+   */
+  primaryContactEmail: string;
+  /**
+   * Phone number (9-15 digits, optional + at start)
+   */
+  primaryContactPhone: string;
+  status: 'active' | 'inactive' | 'suspended' | 'pending';
+  /**
+   * Additional company information
+   */
+  additionalInfo: {
+    /**
+     * Company website URL
+     */
+    website?: string | null;
+    /**
+     * VAT registration number
+     */
+    taxNumber?: string | null;
+    /**
+     * CR Number - unique identifier
+     */
+    commercialRegistration: string;
+    address?: {
+      /**
+       * Street address (max 300 characters)
+       */
+      street?: string | null;
+      /**
+       * City name
+       */
+      city?: string | null;
+      postalCode?: string | null;
+      country?: string | null;
+    };
+  };
+  /**
+   * Company users with access to the system
+   */
+  users?: (number | User)[] | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -158,23 +276,719 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employees".
+ */
+export interface Employee {
+  id: number;
+  /**
+   * Company this employee is assigned to
+   */
+  company: number | Company;
+  /**
+   * Employee full name (max 200 characters)
+   */
+  fullName: string;
+  /**
+   * Unique employee ID within the company
+   */
+  employeeId: string;
+  /**
+   * National ID or Iqama number (10-15 digits)
+   */
+  nationalId: string;
+  /**
+   * Employee job title or position
+   */
+  jobTitle: string;
+  /**
+   * Employment contract information
+   */
+  contractInfo: {
+    /**
+     * Contract start date (not more than 30 days in future)
+     */
+    startDate: string;
+    /**
+     * Contract end date (optional, must be after start date)
+     */
+    endDate?: string | null;
+    /**
+     * Automatically renew contract when it expires
+     */
+    autoRenew?: boolean | null;
+  };
+  /**
+   * Salary and payroll information
+   */
+  payrollInfo: {
+    /**
+     * Basic monthly salary in SAR
+     */
+    basicSalary: number;
+    /**
+     * Monthly allowances in SAR
+     */
+    allowances?: number | null;
+    /**
+     * Monthly deductions in SAR
+     */
+    deductions?: number | null;
+    /**
+     * Gross Pay = Basic Salary + Allowances (auto-calculated)
+     */
+    grossPay?: number | null;
+    /**
+     * Net Salary = Gross Pay - Deductions (auto-calculated)
+     */
+    netSalary?: number | null;
+    /**
+     * Saudi IBAN (24 characters starting with SA)
+     */
+    iban: string;
+  };
+  /**
+   * Employee contact information
+   */
+  contactInfo?: {
+    /**
+     * Employee email address
+     */
+    email?: string | null;
+    /**
+     * Employee phone number
+     */
+    phone?: string | null;
+  };
+  /**
+   * Employee status
+   */
+  status: 'active' | 'inactive' | 'terminated';
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payroll-requests".
+ */
+export interface PayrollRequest {
+  id: number;
+  title?: string | null;
+  /**
+   * Company requesting payroll processing
+   */
+  company: number | Company;
+  /**
+   * Payroll period month/year
+   */
+  payrollPeriod: string;
+  /**
+   * Number of employees in this payroll (auto-calculated)
+   */
+  employeesCount?: number | null;
+  /**
+   * Payroll totals and summary
+   */
+  payrollSummary?: {
+    /**
+     * Total basic salary for all employees
+     */
+    totalBasicSalary?: number | null;
+    /**
+     * Total allowances for all employees
+     */
+    totalAllowances?: number | null;
+    /**
+     * Total deductions for all employees
+     */
+    totalDeductions?: number | null;
+    /**
+     * Total gross pay for all employees
+     */
+    totalGrossPay?: number | null;
+    /**
+     * Total net pay for all employees
+     */
+    totalNetPay?: number | null;
+  };
+  /**
+   * Total amount for this payroll request (same as total net pay)
+   */
+  totalAmount?: number | null;
+  /**
+   * Current status of the payroll request
+   */
+  status: 'new' | 'under_review' | 'approved' | 'rejected' | 'invoice_generated' | 'processed';
+  /**
+   * User who submitted this payroll request
+   */
+  submittedBy?: (number | null) | User;
+  /**
+   * Admin who reviewed this payroll request
+   */
+  reviewedBy?: (number | null) | User;
+  /**
+   * Date when payroll request was reviewed
+   */
+  reviewedAt?: string | null;
+  /**
+   * Reason for rejecting this payroll request
+   */
+  rejectionReason?: string | null;
+  /**
+   * Generated invoice number
+   */
+  invoiceNumber?: string | null;
+  /**
+   * Internal notes about this payroll request
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Individual employee payslips
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payslips".
+ */
+export interface Payslip {
+  id: number;
+  title?: string | null;
+  /**
+   * Parent payroll request
+   */
+  payrollRequest: number | PayrollRequest;
+  /**
+   * Employee for this payslip
+   */
+  employee: number | Employee;
+  /**
+   * Company that owns this payslip
+   */
+  company: number | Company;
+  /**
+   * Payroll period for this payslip
+   */
+  payrollPeriod: string;
+  /**
+   * Detailed payroll breakdown
+   */
+  payrollDetails: {
+    /**
+     * Basic salary amount
+     */
+    basicSalary: number;
+    /**
+     * Total allowances
+     */
+    allowances?: number | null;
+    /**
+     * Total deductions
+     */
+    deductions?: number | null;
+    /**
+     * Gross pay (Basic + Allowances)
+     */
+    grossPay?: number | null;
+    /**
+     * Net pay (Gross - Deductions)
+     */
+    netPay: number;
+    /**
+     * Employee IBAN for payment
+     */
+    iban?: string | null;
+  };
+  /**
+   * Current status of the payslip
+   */
+  status: 'generated' | 'sent' | 'downloaded' | 'viewed';
+  /**
+   * Date when payslip was sent to employee
+   */
+  sentAt?: string | null;
+  /**
+   * Date when employee viewed/downloaded payslip
+   */
+  viewedAt?: string | null;
+  /**
+   * Whether PDF has been generated
+   */
+  pdfGenerated?: boolean | null;
+  /**
+   * URL/path to generated PDF
+   */
+  pdfUrl?: string | null;
+  /**
+   * Internal notes about this payslip
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * System audit trail for compliance and security
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  /**
+   * Action that was performed
+   */
+  action: string;
+  /**
+   * User who performed the action
+   */
+  user: number | User;
+  /**
+   * Type of resource that was affected
+   */
+  resourceType: 'payroll-requests' | 'payslips' | 'employees' | 'companies' | 'users' | 'tickets' | 'notifications';
+  /**
+   * ID of the resource that was affected
+   */
+  resourceId: string;
+  /**
+   * Additional details about the action
+   */
+  details?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * IP address of the user
+   */
+  ipAddress?: string | null;
+  /**
+   * User agent string
+   */
+  userAgent?: string | null;
+  /**
+   * Severity level of the action
+   */
+  severity: 'info' | 'warning' | 'critical';
+  /**
+   * Category of the action
+   */
+  category: 'auth' | 'payroll' | 'employee' | 'company' | 'system' | 'export' | 'financial';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets".
+ */
+export interface Ticket {
+  id: number;
+  ticketId: string;
+  /**
+   * The company that created this ticket
+   */
+  company: number | Company;
+  /**
+   * The user who created this ticket
+   */
+  createdBy: number | User;
+  subject: string;
+  type: 'technical' | 'payroll' | 'contract' | 'other';
+  priority: 'low' | 'medium' | 'high';
+  status: 'new' | 'in_progress' | 'resolved' | 'closed';
+  description: string;
+  /**
+   * Maximum 3 files, up to 10MB each
+   */
+  attachments?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ticket-messages".
+ */
+export interface TicketMessage {
+  id: number;
+  ticket: number | Ticket;
+  sender: number | User;
+  message: string;
+  /**
+   * Internal notes are only visible to admins
+   */
+  messageType: 'reply' | 'internal_note';
+  /**
+   * Maximum 3 files, up to 10MB each
+   */
+  attachments?:
+    | {
+        file: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  isRead?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: number;
+  /**
+   * Short, clear notification title (max 120 characters)
+   */
+  title: string;
+  /**
+   * Detailed message content (max 500 characters)
+   */
+  message: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Who should receive this notification
+   */
+  recipientType: 'all' | 'specific';
+  /**
+   * Select specific companies to notify
+   */
+  recipients?: (number | Company)[] | null;
+  /**
+   * Admin who sent this notification
+   */
+  sentBy: number | User;
+  status: 'draft' | 'sent' | 'failed';
+  sentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notification-recipients".
+ */
+export interface NotificationRecipient {
+  id: number;
+  /**
+   * The notification that was sent
+   */
+  notification: number | Notification;
+  /**
+   * Company that received the notification
+   */
+  company: number | Company;
+  /**
+   * Specific user who read the notification (optional)
+   */
+  user?: (number | null) | User;
+  /**
+   * Whether this notification has been read
+   */
+  isRead?: boolean | null;
+  /**
+   * When the notification was delivered
+   */
+  deliveredAt: string;
+  /**
+   * When the notification was read
+   */
+  readAt?: string | null;
+  /**
+   * Status of notification delivery
+   */
+  deliveryStatus: 'delivered' | 'failed' | 'pending';
+  /**
+   * List of users from this company who have read the notification
+   */
+  readBy?:
+    | {
+        user: number | User;
+        readAt: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-us".
+ */
+export interface ContactUs {
+  id: number;
+  /**
+   * Name of the company (max 100 characters)
+   */
+  companyName: string;
+  /**
+   * Full name of the contact person (max 50 characters)
+   */
+  contactPersonName: string;
+  /**
+   * Valid email address for contact
+   */
+  email: string;
+  /**
+   * Job title or position (max 100 characters)
+   */
+  jobTitle: string;
+  /**
+   * Size of the company by employee count
+   */
+  companySize: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+  /**
+   * Preferred method of contact
+   */
+  contactMethod: 'email' | 'phone' | 'video';
+  /**
+   * Additional message or information (max 1000 characters)
+   */
+  message?: string | null;
+  /**
+   * Current status of this contact inquiry
+   */
+  status: 'open' | 'closed';
+  /**
+   * Internal notes about this contact inquiry
+   */
+  notes?:
+    | {
+        note: string;
+        addedBy: number | User;
+        addedAt: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Date when inquiry was closed
+   */
+  closedAt?: string | null;
+  /**
+   * Admin who closed this inquiry
+   */
+  closedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exports".
+ */
+export interface Export {
+  id: number;
+  name?: string | null;
+  format?: ('csv' | 'json') | null;
+  limit?: number | null;
+  page?: number | null;
+  sort?: string | null;
+  sortOrder?: ('asc' | 'desc') | null;
+  locale?: ('all' | 'en') | null;
+  drafts?: ('yes' | 'no') | null;
+  selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
+  fields?: string[] | null;
+  collectionSlug: string;
+  where?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'createCollectionExport';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'createCollectionExport') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'companies';
+        value: number | Company;
+      } | null)
+    | ({
+        relationTo: 'employees';
+        value: number | Employee;
+      } | null)
+    | ({
+        relationTo: 'payroll-requests';
+        value: number | PayrollRequest;
+      } | null)
+    | ({
+        relationTo: 'payslips';
+        value: number | Payslip;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'tickets';
+        value: number | Ticket;
+      } | null)
+    | ({
+        relationTo: 'ticket-messages';
+        value: number | TicketMessage;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: number | Notification;
+      } | null)
+    | ({
+        relationTo: 'notification-recipients';
+        value: number | NotificationRecipient;
+      } | null)
+    | ({
+        relationTo: 'contact-us';
+        value: number | ContactUs;
+      } | null)
+    | ({
+        relationTo: 'exports';
+        value: number | Export;
+      } | null)
+    | ({
+        relationTo: 'payload-jobs';
+        value: number | PayloadJob;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -184,10 +998,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -207,7 +1021,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -218,6 +1032,10 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
+  company?: T;
+  firstName?: T;
+  lastName?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -255,6 +1073,316 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companies_select".
+ */
+export interface CompaniesSelect<T extends boolean = true> {
+  companyLegalName?: T;
+  region?: T;
+  industry?: T;
+  companySize?: T;
+  primaryContactName?: T;
+  primaryContactEmail?: T;
+  primaryContactPhone?: T;
+  status?: T;
+  additionalInfo?:
+    | T
+    | {
+        website?: T;
+        taxNumber?: T;
+        commercialRegistration?: T;
+        address?:
+          | T
+          | {
+              street?: T;
+              city?: T;
+              postalCode?: T;
+              country?: T;
+            };
+      };
+  users?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employees_select".
+ */
+export interface EmployeesSelect<T extends boolean = true> {
+  company?: T;
+  fullName?: T;
+  employeeId?: T;
+  nationalId?: T;
+  jobTitle?: T;
+  contractInfo?:
+    | T
+    | {
+        startDate?: T;
+        endDate?: T;
+        autoRenew?: T;
+      };
+  payrollInfo?:
+    | T
+    | {
+        basicSalary?: T;
+        allowances?: T;
+        deductions?: T;
+        grossPay?: T;
+        netSalary?: T;
+        iban?: T;
+      };
+  contactInfo?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+      };
+  status?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payroll-requests_select".
+ */
+export interface PayrollRequestsSelect<T extends boolean = true> {
+  title?: T;
+  company?: T;
+  payrollPeriod?: T;
+  employeesCount?: T;
+  payrollSummary?:
+    | T
+    | {
+        totalBasicSalary?: T;
+        totalAllowances?: T;
+        totalDeductions?: T;
+        totalGrossPay?: T;
+        totalNetPay?: T;
+      };
+  totalAmount?: T;
+  status?: T;
+  submittedBy?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
+  rejectionReason?: T;
+  invoiceNumber?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payslips_select".
+ */
+export interface PayslipsSelect<T extends boolean = true> {
+  title?: T;
+  payrollRequest?: T;
+  employee?: T;
+  company?: T;
+  payrollPeriod?: T;
+  payrollDetails?:
+    | T
+    | {
+        basicSalary?: T;
+        allowances?: T;
+        deductions?: T;
+        grossPay?: T;
+        netPay?: T;
+        iban?: T;
+      };
+  status?: T;
+  sentAt?: T;
+  viewedAt?: T;
+  pdfGenerated?: T;
+  pdfUrl?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  action?: T;
+  user?: T;
+  resourceType?: T;
+  resourceId?: T;
+  details?: T;
+  ipAddress?: T;
+  userAgent?: T;
+  severity?: T;
+  category?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tickets_select".
+ */
+export interface TicketsSelect<T extends boolean = true> {
+  ticketId?: T;
+  company?: T;
+  createdBy?: T;
+  subject?: T;
+  type?: T;
+  priority?: T;
+  status?: T;
+  description?: T;
+  attachments?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ticket-messages_select".
+ */
+export interface TicketMessagesSelect<T extends boolean = true> {
+  ticket?: T;
+  sender?: T;
+  message?: T;
+  messageType?: T;
+  attachments?:
+    | T
+    | {
+        file?: T;
+        id?: T;
+      };
+  isRead?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  title?: T;
+  message?: T;
+  recipientType?: T;
+  recipients?: T;
+  sentBy?: T;
+  status?: T;
+  sentAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notification-recipients_select".
+ */
+export interface NotificationRecipientsSelect<T extends boolean = true> {
+  notification?: T;
+  company?: T;
+  user?: T;
+  isRead?: T;
+  deliveredAt?: T;
+  readAt?: T;
+  deliveryStatus?: T;
+  readBy?:
+    | T
+    | {
+        user?: T;
+        readAt?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-us_select".
+ */
+export interface ContactUsSelect<T extends boolean = true> {
+  companyName?: T;
+  contactPersonName?: T;
+  email?: T;
+  jobTitle?: T;
+  companySize?: T;
+  contactMethod?: T;
+  message?: T;
+  status?: T;
+  notes?:
+    | T
+    | {
+        note?: T;
+        addedBy?: T;
+        addedAt?: T;
+        id?: T;
+      };
+  closedAt?: T;
+  closedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exports_select".
+ */
+export interface ExportsSelect<T extends boolean = true> {
+  name?: T;
+  format?: T;
+  limit?: T;
+  page?: T;
+  sort?: T;
+  sortOrder?: T;
+  locale?: T;
+  drafts?: T;
+  selectionToUse?: T;
+  fields?: T;
+  collectionSlug?: T;
+  where?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -284,6 +1412,38 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskCreateCollectionExport".
+ */
+export interface TaskCreateCollectionExport {
+  input: {
+    name?: string | null;
+    format?: ('csv' | 'json') | null;
+    limit?: number | null;
+    page?: number | null;
+    sort?: string | null;
+    sortOrder?: ('asc' | 'desc') | null;
+    locale?: ('all' | 'en') | null;
+    drafts?: ('yes' | 'no') | null;
+    selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
+    fields?: string[] | null;
+    collectionSlug: string;
+    where?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    user?: string | null;
+    userCollection?: string | null;
+    exportsCollection?: string | null;
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

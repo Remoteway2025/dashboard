@@ -18,9 +18,10 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
-    "@payloadcms/db-mongodb": "3.55.1",
+    "@payloadcms/db-sqlite": "^3.55.1",
     "@payloadcms/next": "3.55.1",
     "@payloadcms/payload-cloud": "3.55.1",
+    "@payloadcms/plugin-import-export": "^3.55.1",
     "@payloadcms/richtext-lexical": "3.55.1",
     "@payloadcms/ui": "3.55.1",
     "cross-env": "^7.0.3",

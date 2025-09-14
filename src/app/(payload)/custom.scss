@@ -1,0 +1,269 @@
+/* Primary Button */
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+body {
+    font-family: "Rubik", sans-serif;
+}
+
+.btn--style-primary {
+    border-radius: 9px;
+}
+
+.column-selector {
+    border-radius: 9px;
+}
+
+.btn--style-secondary {
+    border-radius: 9px;
+}
+
+.consultant-image {
+    border-radius: 20px;
+}
+
+.table th:first-child,
+.table td:first-child {
+    padding-inline-start: 10px;
+}
+
+// button,
+// a,
+// .where-builder {
+//     //border-radius: 9px;
+// }
+
+// .pill {
+//     //border-radius: 9px !important;
+// }
+
+:root {
+     
+    --color-success-0: #ffffff;
+    --color-success-50: #f1faf6;
+    --color-success-100: #e3f5ed;
+    --color-success-150: #d5efe4;
+    --color-success-200: #c8eadb;
+    --color-success-250: #bae5d3;
+    --color-success-300: #ace0ca;
+    --color-success-350: #9edac1;
+    --color-success-400: #90d5b8;
+    --color-success-450: #82d0af;
+    --color-success-500: #34ad7a;
+    --color-success-550: #30a071;
+    --color-success-600: #2d9468;
+    --color-success-650: #298860;
+    --color-success-700: #257b57;
+    --color-success-750: #226f4e;
+    --color-success-800: #1e6346;
+    --color-success-850: #1a563d;
+    --color-success-900: #164a34;
+    --color-success-950: #133e2b;
+    --color-warning-0: #ffffff;
+    --color-warning-50: #fff9ed;
+    --color-warning-100: #fff3dc;
+    --color-warning-150: #ffeeca;
+    --color-warning-200: #ffe8b9;
+    --color-warning-250: #ffe2a7;
+    --color-warning-300: #ffdc95;
+    --color-warning-350: #ffd684;
+    --color-warning-400: #ffd172;
+    --color-warning-450: #ffcb61;
+    --color-warning-500: #f6a500;
+    --color-warning-550: #e59900;
+    --color-warning-600: #d38e00;
+    --color-warning-650: #c18200;
+    --color-warning-700: #b07600;
+    --color-warning-750: #9e6a00;
+    --color-warning-800: #8d5e00;
+    --color-warning-850: #7b5300;
+    --color-warning-900: #6a4700;
+    --color-warning-950: #583b00;
+    --color-error-0: #ffffff;
+    --color-error-50: #fff3f1;
+    --color-error-100: #ffe8e2;
+    --color-error-150: #ffdcd4;
+    --color-error-200: #ffd0c6;
+    --color-error-250: #ffc5b8;
+    --color-error-300: #ffb9a9;
+    --color-error-350: #ffad9b;
+    --color-error-400: #ffa28d;
+    --color-error-450: #ff967f;
+    --color-error-500: #f6532e;
+    --color-error-550: #e54d2b;
+    --color-error-600: #d34728;
+    --color-error-650: #c14124;
+    --color-error-700: #b03b21;
+    --color-error-750: #9e351e;
+    --color-error-800: #8d2f1a;
+    --color-error-850: #7b2a17;
+    --color-error-900: #6a2414;
+    --color-error-950: #581e11;
+    --color-accent-0: #ffffff;
+    --color-accent-50: #fbedef;
+    --color-accent-100: #f8dcdf;
+    --color-accent-150: #f4cacf;
+    --color-accent-200: #f1b9be;
+    --color-accent-250: #eda7ae;
+    --color-accent-300: #ea959e;
+    --color-accent-350: #e6848e;
+    --color-accent-400: #e3727e;
+    --color-accent-450: #df616e;
+    --color-accent-500: #c50014;
+    --color-accent-550: #b70013;
+    --color-accent-600: #a90011;
+    --color-accent-650: #9b0010;
+    --color-accent-700: #8d000e;
+    --color-accent-750: #7f000d;
+    --color-accent-800: #71000c;
+    --color-accent-850: #62000a;
+    --color-accent-900: #540009;
+    --color-accent-950: #460007;
+}
+
+th {
+    font-weight: bold;
+}
+
+td {
+    display: table-cell;
+    /* Keep table cell behavior */
+    vertical-align: middle;
+    padding-left: 10px;
+}
+
+.gravatar-account {
+    border-radius: 25% !important;
+}
+
+.list-controls__wrap {
+    border-radius: 19px;
+}
+
+.nav__link {
+    align-items: center;
+    padding-block: 0.8rem 2.5px;
+    display: flex;
+    position: relative;
+    font-size: 1.1rem;
+}
+
+.nav-group__label {
+    font-weight: bold;
+    padding: 5px 0px 5px 10px;
+}
+
+.nav-group__toggle {
+    border: 1px solid;
+    border-radius: 5px;
+}
+
+.list-header__title-actions {
+    margin-bottom: 0;
+}
+
+.nav-group__toggle svg {
+    flex-shrink: 0;
+    margin-top: 4px;
+    margin-right: 4px;
+}
+
+.app-header__localizer.localizer {
+    margin-right: 1rem;
+    border-radius: 19px;;
+}
+
+.localizer-button {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+}
+
+.nav__link:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.copy-to-clipboard {
+    padding-left: 0.3rem;
+}
+
+:root {
+    font-size: 0.95rem; // Adjust as needed
+}
+
+label.field-label {
+    font-size: .985rem !important;
+}
+
+.messages-wrapper {
+    align-content: center;
+    align-self: center;
+    align-items: center;
+    width: 50%;
+    height: 50%;
+}
+
+.my {
+    margin-block: 5px;
+}
+
+.nav-group .nav__link[id*='nav-user']::before,
+.nav-group .nav__link[id*='nav-tickets']::before,
+.nav-group .nav__link[id*='nav-companies']::before,
+.nav-group .nav__link[id*='nav-media']::before,
+.nav-group .nav__link[id*='nav-medical-file']::before,
+.nav-group .nav__link[id*='nav-message']::before,
+.nav-group .nav__link[id*='nav-contact-us']::before,
+.nav-group .nav__link[id*='nav-employees']::before,
+.nav-group .nav__link[id*='nav-payroll-requests']::before,
+.nav-group .nav__link[id*='nav-payslips']::before,
+.nav-group .nav__link[id*='nav-notification']::before,
+.nav-group .nav__link[id*='nav-global-settings']::before {
+    content: '';
+    display: inline-block;
+    margin-right: 1.2rem;
+    width: 20px;
+    height: 20px;
+    background-color: currentColor;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+.nav-group .nav__link[id*='nav-notification']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/bell.svg');
+}
+
+.nav-group .nav__link[id*='nav-tickets']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/ticket.svg');
+}
+
+.nav-group .nav__link[id*='nav-companies']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/house.svg');
+}
+
+.nav-group .nav__link[id*='nav-media']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/folder.svg');
+}
+
+.nav-group .nav__link[id*='nav-user']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/user.svg');
+}
+
+.nav-group .nav__link[id*='nav-contact-us']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/contact.svg');
+}
+
+.nav-group .nav__link[id*='nav-employees']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/id-card.svg');
+}
+
+.nav-group .nav__link[id*='nav-payroll-requests']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/archive.svg');
+}
+
+.nav-group .nav__link[id*='nav-payslips']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/wallet.svg');
+}

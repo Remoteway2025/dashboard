@@ -1,43 +1,135 @@
-version: '3'
+# Use latest Compose file format
+name: remoteway-app
+version: '3.8'
 
 services:
   payload:
     image: node:18-alpine
+    container_name: remoteway-payload
+    restart: unless-stopped
+
+    # Network and ports
     ports:
-      - '3000:3000'
-    volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
-    depends_on:
-      - mongo
-      # - postgres
+      - "3000:3000"
+
+    # Environment configuration
     env_file:
       - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URI=file:./data/remoteway.db
+      - PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL:-http://localhost:3000}
 
-  # Ensure your DATABASE_URI uses 'mongo' as the hostname ie. mongodb://mongo/my-db-name
-  mongo:
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-    command:
-      - --storageEngine=wiredTiger
+    # Volume mounts - optimized for performance
     volumes:
-      - data:/data/db
+      # Source code (read-only for production)
+      - type: bind
+        source: .
+        target: /home/node/app
+        read_only: false
+
+      # SQLite database - persistent named volume
+      - type: volume
+        source: sqlite_data
+        target: /home/node/app/data
+        volume:
+          nocopy: true
+
+      # Media uploads - persistent named volume
+      - type: volume
+        source: uploads
+        target: /home/node/app/uploads
+        volume:
+          nocopy: true
+
+      # Node modules cache - anonymous volume for better performance
+      - type: volume
+        target: /home/node/app/node_modules
+
+    # Working directory
+    working_dir: /home/node/app
+
+    # Optimized startup command
+    command: >
+      sh -c "
+        corepack enable &&
+        corepack prepare pnpm@latest --activate &&
+        pnpm install --frozen-lockfile --prefer-offline &&
+        pnpm build &&
+        pnpm serve
+      "
+
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+      start_interval: 5s
+
+    # Resource limits and reservations
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+          pids: 100
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Security settings
+    user: "node"
+    read_only: false
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+
+    # Logging configuration
     logging:
-      driver: none
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
 
-  # Uncomment the following to use postgres
-  # postgres:
-  #   restart: always
-  #   image: postgres:latest
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
+    # Labels for better container management
+    labels:
+      - "app=remoteway"
+      - "service=payload"
+      - "environment=production"
 
+# Optimized volume definitions
 volumes:
-  data:
-  # pgdata:
-  node_modules:
+  # SQLite database volume with optimized driver options
+  sqlite_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data
+    labels:
+      - "app=remoteway"
+      - "data=database"
+
+  # Uploads volume for media files
+  uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./uploads
+    labels:
+      - "app=remoteway"
+      - "data=uploads"
+
+# Network configuration (optional but recommended)
+networks:
+  default:
+    name: remoteway-network
+    labels:
+      - "app=remoteway"
