@@ -20,31 +20,19 @@ services:
       - DATABASE_URI=file:./data/remoteway.db
       - PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL:-http://localhost:3000}
 
-    # Volume mounts - optimized for performance
+    # Volume mounts - simplified for deployment
     volumes:
-      # Source code (read-only for production)
-      - type: bind
-        source: .
-        target: /home/node/app
-        read_only: false
+      # Source code
+      - .:/home/node/app
 
       # SQLite database - persistent named volume
-      - type: volume
-        source: sqlite_data
-        target: /home/node/app/data
-        volume:
-          nocopy: true
+      - sqlite_data:/home/node/app/data
 
       # Media uploads - persistent named volume
-      - type: volume
-        source: uploads
-        target: /home/node/app/uploads
-        volume:
-          nocopy: true
+      - uploads_data:/home/node/app/uploads
 
-      # Node modules cache - anonymous volume for better performance
-      - type: volume
-        target: /home/node/app/node_modules
+      # Node modules cache
+      - node_modules:/home/node/app/node_modules
 
     # Working directory
     working_dir: /home/node/app
@@ -66,7 +54,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
-      start_interval: 5s
 
     # Resource limits and reservations
     deploy:
@@ -74,20 +61,9 @@ services:
         limits:
           cpus: '2.0'
           memory: 2G
-          pids: 100
         reservations:
           cpus: '0.5'
           memory: 512M
-
-    # Security settings
-    user: "node"
-    read_only: false
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
 
     # Logging configuration
     logging:
@@ -103,33 +79,21 @@ services:
       - "service=payload"
       - "environment=production"
 
-# Optimized volume definitions
+# Simple volume definitions for deployment
 volumes:
-  # SQLite database volume with optimized driver options
+  # SQLite database volume
   sqlite_data:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data
-    labels:
-      - "app=remoteway"
-      - "data=database"
 
   # Uploads volume for media files
-  uploads:
+  uploads_data:
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./uploads
-    labels:
-      - "app=remoteway"
-      - "data=uploads"
 
-# Network configuration (optional but recommended)
+  # Node modules volume
+  node_modules:
+    driver: local
+
+# Network configuration
 networks:
   default:
     name: remoteway-network
-    labels:
-      - "app=remoteway"
