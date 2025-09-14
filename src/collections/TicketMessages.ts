@@ -25,7 +25,9 @@ export const TicketMessages: CollectionConfig = {
       required: true,
       admin: {
         readOnly: true,
+        hidden: true,
       },
+      defaultValue: ({ user }) => user?.id,
     },
     {
       name: 'message',
@@ -55,6 +57,9 @@ export const TicketMessages: CollectionConfig = {
       admin: {
         description: 'Internal notes are only visible to admins',
       },
+      access: {
+        read: ({ req: { user } }) => user?.role !== 'employer',
+      }
     },
     {
       name: 'attachments',
@@ -94,33 +99,25 @@ export const TicketMessages: CollectionConfig = {
   ],
   access: {
     read: ({ req: { user } }) => {
+
       if (!user) return false
+
       if (user.role === 'super admin') return true
+
       if (user.role === 'employer') {
         return {
-          or: [
-            {
-              sender: {
-                equals: user.id,
-              },
-            },
-            {
-              and: [
-                {
-                  messageType: {
-                    not_equals: 'internal_note',
-                  },
-                },
-                {
-                  'ticket.company': {
-                    equals: user.id,
-                  },
-                },
-              ],
-            },
-          ],
+          sender: {
+            equals: user.id,
+          },
+          messageType: {
+            not_equals: 'internal_note',
+          },
+          'ticket.company': {
+            equals: user.id,
+          }
         }
       }
+
       return false
     },
     create: ({ req: { user } }) => {
@@ -132,11 +129,25 @@ export const TicketMessages: CollectionConfig = {
       return user.role === 'super admin'
     },
     delete: ({ req: { user } }) => {
-      if (!user) return false
-      return user.role === 'super admin'
+      return false
     },
   },
   hooks: {
+    beforeChange: [
+      async ({ data, req, operation }) => {
+        // Always set sender to current user
+        if (operation === 'create' && req.user) {
+          data.sender = req.user.id
+
+          // Force messageType to 'reply' for employer users
+          if (req.user.role === 'employer') {
+            data.messageType = 'reply'
+          }
+        }
+
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }) => {
         if (operation === 'create' && doc.messageType === 'reply') {

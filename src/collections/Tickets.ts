@@ -8,9 +8,9 @@ export const Tickets: CollectionConfig = {
     listSearchableFields: ['ticketId', 'subject', 'description'],
   },
   timestamps: true,
-  versions:{
+  versions: {
     drafts: false
-  },  
+  },
   fields: [
     {
       name: 'ticketId',
@@ -23,11 +23,18 @@ export const Tickets: CollectionConfig = {
       },
       hooks: {
         beforeValidate: [
-          ({ value, operation }) => {
+          async ({ value, operation, req }) => {
             if (operation === 'create' && !value) {
-              const timestamp = Date.now()
-              const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-              return `TKT-${timestamp}-${random}`
+              // Get current year and month
+              const now = new Date()
+              const year = now.getFullYear().toString().slice(-2) // Last 2 digits of year
+              const month = (now.getMonth() + 1).toString().padStart(2, '0')
+
+              // Generate a random 4-digit number
+              const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
+
+              // Format: TK-YYMM-XXXX (e.g., TK-2509-1234)
+              return `TK-${year}${month}-${random}`
             }
             return value
           },
@@ -181,6 +188,13 @@ export const Tickets: CollectionConfig = {
         },
       ],
     },
+    {
+      name: "messages",
+      label: "Thread",
+      type: "join",
+      collection: "ticket-messages",
+      on: "ticket"
+    },
   ],
   access: {
     read: ({ req: { user } }) => {
@@ -212,8 +226,7 @@ export const Tickets: CollectionConfig = {
       return false
     },
     delete: ({ req: { user } }) => {
-      if (!user) return false
-      return user.role === 'super admin'
+      return false
     },
   },
   hooks: {
@@ -226,7 +239,7 @@ export const Tickets: CollectionConfig = {
             data.company = req.user.company?.id || req.user.company
           }
         }
-        
+
         // Track status changes
         if (operation === 'update' && originalDoc && data.status !== originalDoc.status) {
           if (!data.statusHistory) {

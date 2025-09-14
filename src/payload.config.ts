@@ -68,7 +68,7 @@ export default buildConfig({
     payloadCloudPlugin(),
     // storage-adapter-placeholder
     importExportPlugin({
-      collections: ['employees', 'payroll-requests', 'contact-us']
+      collections: ['companies', 'employees', 'payroll-requests', 'contact-us']
     })
   ],
 })

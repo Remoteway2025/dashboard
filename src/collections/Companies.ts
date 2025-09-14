@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, AccessArgs } from 'payload'
 
 const freeEmailDomains = [
   'gmail.com',
@@ -22,8 +22,9 @@ export const Companies: CollectionConfig = {
     defaultColumns: ['companyLegalName', 'region', 'industry', 'primaryContactEmail', 'status', 'createdAt'],
   },
   timestamps: true,
+  trash: true,
   access: {
-    read: ({ req: { user, query } }) => {
+    read: ({ req, req: { user, query } }) => {
 
       if (user?.role === 'super admin') return true
 
@@ -333,16 +334,7 @@ export const Companies: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'users',
-      type: 'relationship',
-      relationTo: 'users',
-      hasMany: true,
-      admin: {
-        description: 'Company users with access to the system',
-        position: 'sidebar',
-      },
-    },
+
     {
       name: 'notes',
       type: 'textarea',

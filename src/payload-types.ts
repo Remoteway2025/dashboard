@@ -85,7 +85,11 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    tickets: {
+      messages: 'ticket-messages';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -106,7 +110,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   globals: {};
   globalsSelect: {};
@@ -148,12 +152,12 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   role: 'super admin' | 'employer';
   /**
    * The company this user belongs to
    */
-  company?: (number | null) | Company;
+  company?: (string | null) | Company;
   firstName?: string | null;
   lastName?: string | null;
   updatedAt: string;
@@ -179,7 +183,7 @@ export interface User {
  * via the `definition` "companies".
  */
 export interface Company {
-  id: number;
+  id: string;
   /**
    * Official registered company name
    */
@@ -247,20 +251,17 @@ export interface Company {
       country?: string | null;
     };
   };
-  /**
-   * Company users with access to the system
-   */
-  users?: (number | User)[] | null;
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
-  id: number;
+  id: string;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -279,11 +280,11 @@ export interface Media {
  * via the `definition` "employees".
  */
 export interface Employee {
-  id: number;
+  id: string;
   /**
    * Company this employee is assigned to
    */
-  company: number | Company;
+  company: string | Company;
   /**
    * Employee full name (max 200 characters)
    */
@@ -372,12 +373,12 @@ export interface Employee {
  * via the `definition` "payroll-requests".
  */
 export interface PayrollRequest {
-  id: number;
+  id: string;
   title?: string | null;
   /**
    * Company requesting payroll processing
    */
-  company: number | Company;
+  company: string | Company;
   /**
    * Payroll period month/year
    */
@@ -422,11 +423,11 @@ export interface PayrollRequest {
   /**
    * User who submitted this payroll request
    */
-  submittedBy?: (number | null) | User;
+  submittedBy?: (string | null) | User;
   /**
    * Admin who reviewed this payroll request
    */
-  reviewedBy?: (number | null) | User;
+  reviewedBy?: (string | null) | User;
   /**
    * Date when payroll request was reviewed
    */
@@ -453,20 +454,20 @@ export interface PayrollRequest {
  * via the `definition` "payslips".
  */
 export interface Payslip {
-  id: number;
+  id: string;
   title?: string | null;
   /**
    * Parent payroll request
    */
-  payrollRequest: number | PayrollRequest;
+  payrollRequest: string | PayrollRequest;
   /**
    * Employee for this payslip
    */
-  employee: number | Employee;
+  employee: string | Employee;
   /**
    * Company that owns this payslip
    */
-  company: number | Company;
+  company: string | Company;
   /**
    * Payroll period for this payslip
    */
@@ -534,7 +535,7 @@ export interface Payslip {
  * via the `definition` "audit-log".
  */
 export interface AuditLog {
-  id: number;
+  id: string;
   /**
    * Action that was performed
    */
@@ -542,7 +543,7 @@ export interface AuditLog {
   /**
    * User who performed the action
    */
-  user: number | User;
+  user: string | User;
   /**
    * Type of resource that was affected
    */
@@ -587,16 +588,16 @@ export interface AuditLog {
  * via the `definition` "tickets".
  */
 export interface Ticket {
-  id: number;
+  id: string;
   ticketId: string;
   /**
    * The company that created this ticket
    */
-  company: number | Company;
+  company: string | Company;
   /**
    * The user who created this ticket
    */
-  createdBy: number | User;
+  createdBy: string | User;
   subject: string;
   type: 'technical' | 'payroll' | 'contract' | 'other';
   priority: 'low' | 'medium' | 'high';
@@ -607,10 +608,15 @@ export interface Ticket {
    */
   attachments?:
     | {
-        file: number | Media;
+        file: string | Media;
         id?: string | null;
       }[]
     | null;
+  messages?: {
+    docs?: (string | TicketMessage)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -619,9 +625,9 @@ export interface Ticket {
  * via the `definition` "ticket-messages".
  */
 export interface TicketMessage {
-  id: number;
-  ticket: number | Ticket;
-  sender: number | User;
+  id: string;
+  ticket: string | Ticket;
+  sender: string | User;
   message: string;
   /**
    * Internal notes are only visible to admins
@@ -632,7 +638,7 @@ export interface TicketMessage {
    */
   attachments?:
     | {
-        file: number | Media;
+        file: string | Media;
         id?: string | null;
       }[]
     | null;
@@ -645,7 +651,7 @@ export interface TicketMessage {
  * via the `definition` "notifications".
  */
 export interface Notification {
-  id: number;
+  id: string;
   /**
    * Short, clear notification title (max 120 characters)
    */
@@ -675,11 +681,11 @@ export interface Notification {
   /**
    * Select specific companies to notify
    */
-  recipients?: (number | Company)[] | null;
+  recipients?: (string | Company)[] | null;
   /**
    * Admin who sent this notification
    */
-  sentBy: number | User;
+  sentBy: string | User;
   status: 'draft' | 'sent' | 'failed';
   sentAt?: string | null;
   updatedAt: string;
@@ -690,19 +696,19 @@ export interface Notification {
  * via the `definition` "notification-recipients".
  */
 export interface NotificationRecipient {
-  id: number;
+  id: string;
   /**
    * The notification that was sent
    */
-  notification: number | Notification;
+  notification: string | Notification;
   /**
    * Company that received the notification
    */
-  company: number | Company;
+  company: string | Company;
   /**
    * Specific user who read the notification (optional)
    */
-  user?: (number | null) | User;
+  user?: (string | null) | User;
   /**
    * Whether this notification has been read
    */
@@ -724,7 +730,7 @@ export interface NotificationRecipient {
    */
   readBy?:
     | {
-        user: number | User;
+        user: string | User;
         readAt: string;
         id?: string | null;
       }[]
@@ -737,7 +743,7 @@ export interface NotificationRecipient {
  * via the `definition` "contact-us".
  */
 export interface ContactUs {
-  id: number;
+  id: string;
   /**
    * Name of the company (max 100 characters)
    */
@@ -776,7 +782,7 @@ export interface ContactUs {
   notes?:
     | {
         note: string;
-        addedBy: number | User;
+        addedBy: string | User;
         addedAt: string;
         id?: string | null;
       }[]
@@ -788,7 +794,7 @@ export interface ContactUs {
   /**
    * Admin who closed this inquiry
    */
-  closedBy?: (number | null) | User;
+  closedBy?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -797,7 +803,7 @@ export interface ContactUs {
  * via the `definition` "exports".
  */
 export interface Export {
-  id: number;
+  id: string;
   name?: string | null;
   format?: ('csv' | 'json') | null;
   limit?: number | null;
@@ -835,7 +841,7 @@ export interface Export {
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
-  id: number;
+  id: string;
   /**
    * Input data provided to the job
    */
@@ -927,68 +933,68 @@ export interface PayloadJob {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: number | Media;
+        value: string | Media;
       } | null)
     | ({
         relationTo: 'companies';
-        value: number | Company;
+        value: string | Company;
       } | null)
     | ({
         relationTo: 'employees';
-        value: number | Employee;
+        value: string | Employee;
       } | null)
     | ({
         relationTo: 'payroll-requests';
-        value: number | PayrollRequest;
+        value: string | PayrollRequest;
       } | null)
     | ({
         relationTo: 'payslips';
-        value: number | Payslip;
+        value: string | Payslip;
       } | null)
     | ({
         relationTo: 'audit-log';
-        value: number | AuditLog;
+        value: string | AuditLog;
       } | null)
     | ({
         relationTo: 'tickets';
-        value: number | Ticket;
+        value: string | Ticket;
       } | null)
     | ({
         relationTo: 'ticket-messages';
-        value: number | TicketMessage;
+        value: string | TicketMessage;
       } | null)
     | ({
         relationTo: 'notifications';
-        value: number | Notification;
+        value: string | Notification;
       } | null)
     | ({
         relationTo: 'notification-recipients';
-        value: number | NotificationRecipient;
+        value: string | NotificationRecipient;
       } | null)
     | ({
         relationTo: 'contact-us';
-        value: number | ContactUs;
+        value: string | ContactUs;
       } | null)
     | ({
         relationTo: 'exports';
-        value: number | Export;
+        value: string | Export;
       } | null)
     | ({
         relationTo: 'payload-jobs';
-        value: number | PayloadJob;
+        value: string | PayloadJob;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -998,10 +1004,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   key?: string | null;
   value?:
@@ -1021,7 +1027,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -1099,10 +1105,10 @@ export interface CompaniesSelect<T extends boolean = true> {
               country?: T;
             };
       };
-  users?: T;
   notes?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1236,6 +1242,7 @@ export interface TicketsSelect<T extends boolean = true> {
         file?: T;
         id?: T;
       };
+  messages?: T;
   updatedAt?: T;
   createdAt?: T;
 }

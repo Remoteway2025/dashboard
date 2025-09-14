@@ -192,22 +192,20 @@ export const AuditLog: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, req, operation }) => {
-        // Only allow creation of audit logs
+
         if (operation !== 'create') {
           throw new Error('Audit logs cannot be modified or deleted.')
         }
-        
-        // Set user if available from request
+
         if (req.user && !data.user) {
           data.user = req.user.id
         }
-        
-        // Set IP address and user agent
+
         if (req.headers) {
-          data.ipAddress = req.ip || req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown'
-          data.userAgent = req.headers['user-agent'] || 'unknown'
+          data.ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
+          data.userAgent = req.headers.get('user-agent') || 'unknown'
         }
-        
+
         return data
       },
     ],
