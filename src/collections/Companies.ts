@@ -1,4 +1,4 @@
-import type { CollectionConfig, AccessArgs } from 'payload'
+import type { CollectionConfig, AccessArgs, Where } from 'payload'
 
 const freeEmailDomains = [
   'gmail.com',
@@ -28,7 +28,10 @@ export const Companies: CollectionConfig = {
 
       if (user?.role === 'super admin') return true
 
-      if (user?.role === 'employer' && query.where?.id) {
+      // Type assertion to tell TypeScript about the where structure
+      const where = query.where as Where | undefined
+
+      if (user?.role === 'employer' && where?.id) {
         return { id: { equals: user.company?.id || user.company } }
       }
 
