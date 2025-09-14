@@ -1,99 +1,32 @@
-# Use latest Compose file format
-name: remoteway-app
-version: '3.8'
-
 services:
   payload:
     image: node:18-alpine
-    container_name: remoteway-payload
     restart: unless-stopped
-
-    # Network and ports
+    depends_on:
+      - mongo
     ports:
       - "3000:3000"
-
-    # Environment configuration
-    env_file:
-      - .env
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URI=file:./data/remoteway.db
-      - PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL:-http://localhost:3000}
-
-    # Volume mounts - simplified for deployment
     volumes:
-      # Source code
       - .:/home/node/app
-
-      # SQLite database - persistent named volume
-      - sqlite_data:/home/node/app/data
-
-      # Media uploads - persistent named volume
-      - uploads_data:/home/node/app/uploads
-
-      # Node modules cache
       - node_modules:/home/node/app/node_modules
-
-    # Working directory
     working_dir: /home/node/app
-
-    # Optimized startup command
     command: >
       sh -c "
         corepack enable &&
         corepack prepare pnpm@latest --activate &&
-        pnpm install --frozen-lockfile --prefer-offline &&
+        pnpm install --frozen-lockfile &&
         pnpm build &&
         pnpm serve
       "
 
-    # Health check configuration
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
-    # Resource limits and reservations
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-
-    # Logging configuration
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-        compress: "true"
-
-    # Labels for better container management
-    labels:
-      - "app=remoteway"
-      - "service=payload"
-      - "environment=production"
-
-# Simple volume definitions for deployment
 volumes:
-  # SQLite database volume
-  sqlite_data:
-    driver: local
-
-  # Uploads volume for media files
-  uploads_data:
-    driver: local
-
-  # Node modules volume
+  mongo_data:
   node_modules:
-    driver: local
-
-# Network configuration
-networks:
-  default:
-    name: remoteway-network

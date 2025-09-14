@@ -13,12 +13,13 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "serve": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
-    "@payloadcms/db-sqlite": "^3.55.1",
+    "@payloadcms/db-mongodb": "^3.55.1",
     "@payloadcms/next": "3.55.1",
     "@payloadcms/payload-cloud": "3.55.1",
     "@payloadcms/plugin-import-export": "^3.55.1",
@@ -27,8 +28,10 @@
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
+    "import-export-plugin": "^1.2.0",
     "next": "15.4.4",
     "payload": "3.55.1",
+    "payload-extended-import-export-plugin": "^1.0.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sharp": "0.34.2"
