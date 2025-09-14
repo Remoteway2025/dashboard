@@ -1,13 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+
+interface RichTextNode {
+  children?: Array<{
+    text?: string
+    children?: RichTextNode[]
+  }>
+}
+
+interface RichTextContent {
+  root?: {
+    children?: RichTextNode[]
+  }
+}
 
 interface Notification {
   id: string
   notification: {
     id: string
     title: string
-    message: any
+    message: RichTextContent
   }
   deliveredAt: string
   isRead: boolean
@@ -29,7 +42,7 @@ export default function NotificationBell({ companyId, userRole }: NotificationBe
     return null
   }
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/notifications/unread?companyId=${companyId}`, {
@@ -37,7 +50,7 @@ export default function NotificationBell({ companyId, userRole }: NotificationBe
           'Authorization': 'Bearer token', // You'll need to implement proper auth
         },
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setNotifications(data.notifications)
@@ -48,7 +61,7 @@ export default function NotificationBell({ companyId, userRole }: NotificationBe
     } finally {
       setLoading(false)
     }
-  }
+  }, [companyId])
 
   const markAsRead = async (notificationId: string, recipientId: string) => {
     try {
@@ -79,12 +92,12 @@ export default function NotificationBell({ companyId, userRole }: NotificationBe
 
   useEffect(() => {
     fetchNotifications()
-    
+
     // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000)
-    
+
     return () => clearInterval(interval)
-  }, [companyId])
+  }, [fetchNotifications])
 
   return (
     <div className="relative">
@@ -162,7 +175,7 @@ export default function NotificationBell({ companyId, userRole }: NotificationBe
                       <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                         {/* Extract text from rich text content */}
                         {notif.notification.message?.root?.children
-                          ?.map((node: any) => node.children?.map((child: any) => child.text).join(''))
+                          ?.map((node: RichTextNode) => node.children?.map((child) => child.text).join(''))
                           ?.join(' ') || ''}
                       </p>
                       <p className="text-xs text-gray-500 mt-2">
