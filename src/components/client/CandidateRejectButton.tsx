@@ -27,6 +27,11 @@ export default function CandidateRejectButton({
   const { i18n } = useTranslation()
   const { id: docId } = useDocumentInfo()
 
+  // Only show button for employer role
+  if (user?.role !== 'employer') {
+    return null
+  }
+
   // Use candidateId prop if provided, otherwise get from document context
   const actualCandidateId = candidateId || docId
 

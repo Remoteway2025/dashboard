@@ -488,10 +488,8 @@ export const Candidates: CollectionConfig = {
         update: ({ req: { user } }) => {
           // Super admin can update status
           if (user?.role === 'super admin') return true
-          // Employers can update status for candidates assigned to their company
-          if (user?.role === 'employer') {
-            return true // Allow status updates, validation handled in hooks
-          }
+          // Employers cannot directly update status field
+          // They should use the action buttons which go through server actions
           return false
         },
       },

@@ -89,6 +89,38 @@ export async function updateCandidateStatus(candidateId: string, status: 'availa
     const payload = await getPayload({ config })
 
     try {
+        // First, fetch the candidate to check if employer has access
+        const candidate = await payload.findByID({
+            collection: 'candidates',
+            id: candidateId,
+            depth: 0
+        })
+
+        if (!candidate) {
+            throw new Error('Candidate not found')
+        }
+
+        // Check access for employer role
+        if (user?.role === 'employer') {
+            // Employer can only update candidates assigned to their company
+            const companyId = typeof user.company === 'object' ? user.company.id : user.company
+            const candidateCompanyId = typeof candidate.company === 'object' ? candidate.company : candidate.company
+
+            if (candidateCompanyId !== companyId) {
+                throw new Error('You can only update candidates assigned to your company')
+            }
+
+            // Employers can only change status from 'assigned' to 'selected' or 'rejected'
+            if (candidate.status !== 'assigned') {
+                throw new Error('You can only update candidates with assigned status')
+            }
+
+            if (status !== 'selected' && status !== 'rejected') {
+                throw new Error('You can only select or reject candidates')
+            }
+        }
+
+        // Update the status - using overrideAccess:true since we've done our own validation
         const result = await payload.update({
             collection: 'candidates',
             id: candidateId,
@@ -96,7 +128,7 @@ export async function updateCandidateStatus(candidateId: string, status: 'availa
                 status: status
             },
             user,
-            overrideAccess: false // Respect access controls
+            overrideAccess: true // Override field-level access since we validated above
         })
 
         return {
