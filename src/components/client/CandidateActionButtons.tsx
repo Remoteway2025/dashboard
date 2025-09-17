@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from '@payloadcms/ui'
+import { toast, useTranslation } from '@payloadcms/ui'
 import CandidateSelectButton from './CandidateSelectButton'
 import CandidateRejectButton from './CandidateRejectButton'
 
@@ -11,14 +11,12 @@ interface CandidateActionButtonsProps {
   onStatusChange?: () => void
 }
 
-export default function CandidateActionButtons({
-  candidateId,
-  onStatusChange
-}: CandidateActionButtonsProps) {
-  const router = useRouter()
+export default function CandidateActionButtons({ candidateId, onStatusChange }: CandidateActionButtonsProps) {
 
+  const router = useRouter()
+  const { i18n } = useTranslation()
   const handleSelectSuccess = () => {
-    toast.success('Candidate selected successfully')
+    toast.success('Candidate selected successfully', { position: i18n.language == "ar" ? "bottom-left" : "bottom-right" })
     onStatusChange?.()
 
     // Redirect to candidates list after a short delay
@@ -26,7 +24,7 @@ export default function CandidateActionButtons({
   }
 
   const handleRejectSuccess = () => {
-    toast.success('Candidate rejected successfully')
+    toast.success('Candidate rejected successfully', { position: i18n.language == "ar" ? "bottom-left" : "bottom-right" })
     onStatusChange?.()
 
     // Redirect to candidates list after a short delay
@@ -36,7 +34,7 @@ export default function CandidateActionButtons({
 
   const handleError = (error: string) => {
     console.error('Status update error:', error)
-    toast.error(`Error: ${error}`)
+    toast.error(`Error: ${error}`, { position: i18n.language == "ar" ? "bottom-left" : "bottom-right" })
   }
 
   return (

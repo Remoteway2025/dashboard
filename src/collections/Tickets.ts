@@ -21,6 +21,55 @@ export const Tickets: CollectionConfig = {
   versions: {
     drafts: false
   },
+  access: {
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'super admin') return true
+      if (user.role === 'employer' && user.company) {
+        return {
+          company: {
+            equals: user.company?.id || user.company,
+          },
+        }
+      }
+      return false
+    },
+    create: ({ req: { user } }) => {
+      if (!user) return false
+      return user.role === 'employer' || user.role === 'super admin'
+    },
+    update: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'super admin') return true
+      if (user.role === 'employer' && user.company) {
+        return {
+          company: {
+            equals: user.company?.id || user.company,
+          },
+        }
+      }
+      return false
+    },
+    delete: ({ req: { user } }) => {
+      return false
+    },
+    readVersions: ({ req: { user } }) => user?.role == "super admin"
+  },
+  hooks: {
+    beforeChange: [
+      async ({ data, req, operation, originalDoc }) => {
+        // Auto-set createdBy and company for new tickets
+        if (operation === 'create') {
+
+          if (req?.user?.role === 'employer' && req.user.company) {
+            data.company = req.user.company?.id || req.user.company
+          }
+        }
+
+        return data
+      },
+    ],
+  },
   fields: [
     {
       name: 'ticketId',
@@ -328,53 +377,5 @@ export const Tickets: CollectionConfig = {
         },
       },
     },
-  ],
-  access: {
-    read: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'super admin') return true
-      if (user.role === 'employer' && user.company) {
-        return {
-          company: {
-            equals: user.company?.id || user.company,
-          },
-        }
-      }
-      return false
-    },
-    create: ({ req: { user } }) => {
-      if (!user) return false
-      return user.role === 'employer' || user.role === 'super admin'
-    },
-    update: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'super admin') return true
-      if (user.role === 'employer' && user.company) {
-        return {
-          company: {
-            equals: user.company?.id || user.company,
-          },
-        }
-      }
-      return false
-    },
-    delete: ({ req: { user } }) => {
-      return false
-    },
-  },
-  hooks: {
-    beforeChange: [
-      async ({ data, req, operation, originalDoc }) => {
-        // Auto-set createdBy and company for new tickets
-        if (operation === 'create') {
-
-          if (req?.user?.role === 'employer' && req.user.company) {
-            data.company = req.user.company?.id || req.user.company
-          }
-        }
-
-        return data
-      },
-    ],
-  },
+  ]
 }

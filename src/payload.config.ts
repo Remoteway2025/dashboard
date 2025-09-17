@@ -41,10 +41,10 @@ export default buildConfig({
     },
     components: {
       graphics: {
-        Logo: "/components/client/Logo",
+        Logo: "/components/client/logo",
         Icon: "/components/client/icon"
       },
-      beforeNavLinks: "/components/client/Logo",
+      beforeNavLinks: "/components/client/logo",
     }
   },
   i18n: {

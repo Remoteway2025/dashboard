@@ -12,7 +12,7 @@ import { CollectionField as CollectionField_cdf7e044479f899a31f804427d568b36 } f
 import { Preview as Preview_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { ExportSaveButton as ExportSaveButton_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { default as default_f38040ab802462f4282435feb5b20fc1 } from '../../../components/client/icon'
-import { default as default_c3d96a46603c0609b1e0fa50b3549d79 } from '../../../components/client/Logo'
+import { default as default_fa54dbd4b594e30b81fa5be8cac54212 } from '../../../components/client/logo'
 import { ImportExportProvider as ImportExportProvider_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 
 export const importMap = {
@@ -30,6 +30,6 @@ export const importMap = {
   "@payloadcms/plugin-import-export/rsc#Preview": Preview_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#ExportSaveButton": ExportSaveButton_cdf7e044479f899a31f804427d568b36,
   "/components/client/icon#default": default_f38040ab802462f4282435feb5b20fc1,
-  "/components/client/Logo#default": default_c3d96a46603c0609b1e0fa50b3549d79,
+  "/components/client/logo#default": default_fa54dbd4b594e30b81fa5be8cac54212,
   "@payloadcms/plugin-import-export/rsc#ImportExportProvider": ImportExportProvider_cdf7e044479f899a31f804427d568b36
 }

@@ -606,6 +606,7 @@ export const Candidates: CollectionConfig = {
       if (!user) return false
       return user.role === 'super admin'
     },
+    readVersions: ({ req: { user } }) => user?.role == "super admin"
   },
   hooks: {
     afterChange: [
