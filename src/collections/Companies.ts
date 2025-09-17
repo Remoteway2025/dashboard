@@ -21,6 +21,16 @@ export const Companies: CollectionConfig = {
     useAsTitle: 'companyLegalName',
     defaultColumns: ['companyLegalName', 'region', 'industry', 'primaryContactEmail', 'status', 'createdAt'],
   },
+  labels: {
+    singular: {
+      ar: "الشركة",
+      en: "Company"
+    },
+    plural: {
+      ar: "الشركات",
+      en: "Companies"
+    }
+  },
   timestamps: true,
   trash: true,
   access: {
@@ -91,89 +101,134 @@ export const Companies: CollectionConfig = {
     {
       name: 'companyLegalName',
       type: 'text',
+      label: {
+        ar: "الاسم القانوني للشركة",
+        en: "Company Legal Name"
+      },
       required: true,
       maxLength: 200,
       localized: true,
       admin: {
-        placeholder: 'Enter company legal name',
-        description: 'Official registered company name',
+        placeholder: {
+          ar: "أدخل الاسم القانوني للشركة",
+          en: "Enter company legal name"
+        },
+        description: {
+          ar: "الاسم الرسمي المسجل للشركة",
+          en: "Official registered company name"
+        },
       },
     },
     {
       name: 'region',
       type: 'select',
+      label: {
+        ar: "المنطقة",
+        en: "Region"
+      },
       required: true,
       options: [
-        { label: 'Riyadh', value: 'riyadh' },
-        { label: 'Jeddah', value: 'jeddah' },
-        { label: 'Dammam/Khobar', value: 'dammam_khobar' },
-        { label: 'Medina', value: 'medina' },
-        { label: 'Makkah', value: 'makkah' },
-        { label: 'Abha', value: 'abha' },
-        { label: 'Hail', value: 'hail' },
-        { label: 'Tabuk', value: 'tabuk' },
-        { label: 'Jazan', value: 'jazan' },
-        { label: 'Other (Saudi Arabia)', value: 'other_saudi' },
+        { label: { ar: "الرياض", en: "Riyadh" }, value: 'riyadh' },
+        { label: { ar: "جدة", en: "Jeddah" }, value: 'jeddah' },
+        { label: { ar: "الدمام/الخبر", en: "Dammam/Khobar" }, value: 'dammam_khobar' },
+        { label: { ar: "المدينة المنورة", en: "Medina" }, value: 'medina' },
+        { label: { ar: "مكة المكرمة", en: "Makkah" }, value: 'makkah' },
+        { label: { ar: "أبها", en: "Abha" }, value: 'abha' },
+        { label: { ar: "حائل", en: "Hail" }, value: 'hail' },
+        { label: { ar: "تبوك", en: "Tabuk" }, value: 'tabuk' },
+        { label: { ar: "جازان", en: "Jazan" }, value: 'jazan' },
+        { label: { ar: "أخرى (السعودية)", en: "Other (Saudi Arabia)" }, value: 'other_saudi' },
       ],
       admin: {
-        placeholder: 'Select region/city',
+        placeholder: {
+          ar: "اختر المنطقة/المدينة",
+          en: "Select region/city"
+        },
       },
     },
     {
       name: 'industry',
       type: 'select',
+      label: {
+        ar: "القطاع",
+        en: "Industry"
+      },
       required: true,
       options: [
-        { label: 'ICT / Software', value: 'ict_software' },
-        { label: 'Industrial & Manufacturing', value: 'industrial_manufacturing' },
-        { label: 'Retail & E-commerce', value: 'retail_ecommerce' },
-        { label: 'Financial Services', value: 'financial_services' },
-        { label: 'Logistics & Transportation', value: 'logistics_transportation' },
-        { label: 'Education & Training', value: 'education_training' },
-        { label: 'Healthcare', value: 'healthcare' },
-        { label: 'Construction & Real Estate', value: 'construction_realestate' },
-        { label: 'Hospitality & Tourism', value: 'hospitality_tourism' },
-        { label: 'Government / Semi-Gov', value: 'government' },
-        { label: 'Other', value: 'other' },
+        { label: { ar: "تقنية المعلومات / البرمجيات", en: "ICT / Software" }, value: 'ict_software' },
+        { label: { ar: "الصناعة والتصنيع", en: "Industrial & Manufacturing" }, value: 'industrial_manufacturing' },
+        { label: { ar: "التجزئة والتجارة الإلكترونية", en: "Retail & E-commerce" }, value: 'retail_ecommerce' },
+        { label: { ar: "الخدمات المالية", en: "Financial Services" }, value: 'financial_services' },
+        { label: { ar: "اللوجستيات والنقل", en: "Logistics & Transportation" }, value: 'logistics_transportation' },
+        { label: { ar: "التعليم والتدريب", en: "Education & Training" }, value: 'education_training' },
+        { label: { ar: "الرعاية الصحية", en: "Healthcare" }, value: 'healthcare' },
+        { label: { ar: "البناء والعقارات", en: "Construction & Real Estate" }, value: 'construction_realestate' },
+        { label: { ar: "الضيافة والسياحة", en: "Hospitality & Tourism" }, value: 'hospitality_tourism' },
+        { label: { ar: "حكومي / شبه حكومي", en: "Government / Semi-Gov" }, value: 'government' },
+        { label: { ar: "أخرى", en: "Other" }, value: 'other' },
       ],
       admin: {
-        placeholder: 'Select industry',
+        placeholder: {
+          ar: "اختر القطاع",
+          en: "Select industry"
+        },
       },
     },
     {
       name: 'companySize',
       type: 'select',
+      label: {
+        ar: "حجم الشركة",
+        en: "Company Size"
+      },
       required: true,
       options: [
-        { label: '0-10 employees', value: '0_10' },
-        { label: '5-25 employees', value: '5_25' },
-        { label: '25-50 employees', value: '25_50' },
-        { label: '50-100 employees', value: '50_100' },
-        { label: '100-500 employees', value: '100_500' },
-        { label: '500-1000 employees', value: '500_1000' },
-        { label: '1000+ employees', value: '1000_plus' },
+        { label: { ar: "0-10 موظفين", en: "0-10 employees" }, value: '0_10' },
+        { label: { ar: "5-25 موظف", en: "5-25 employees" }, value: '5_25' },
+        { label: { ar: "25-50 موظف", en: "25-50 employees" }, value: '25_50' },
+        { label: { ar: "50-100 موظف", en: "50-100 employees" }, value: '50_100' },
+        { label: { ar: "100-500 موظف", en: "100-500 employees" }, value: '100_500' },
+        { label: { ar: "500-1000 موظف", en: "500-1000 employees" }, value: '500_1000' },
+        { label: { ar: "أكثر من 1000 موظف", en: "1000+ employees" }, value: '1000_plus' },
       ],
       admin: {
-        placeholder: 'Select company size',
+        placeholder: {
+          ar: "اختر حجم الشركة",
+          en: "Select company size"
+        },
       },
     },
     {
       name: 'primaryContactName',
       type: 'text',
+      label: {
+        ar: "اسم جهة الاتصال الأساسية",
+        en: "Primary Contact Name"
+      },
       required: true,
       maxLength: 100,
       localized: true,
       admin: {
-        placeholder: 'Enter primary contact full name',
+        placeholder: {
+          ar: "أدخل الاسم الكامل لجهة الاتصال الأساسية",
+          en: "Enter primary contact full name"
+        },
       },
     },
     {
       name: 'primaryContactEmail',
       type: 'email',
+      label: {
+        ar: "البريد الإلكتروني لجهة الاتصال",
+        en: "Primary Contact Email"
+      },
       required: true,
       admin: {
         placeholder: 'contact@company.com',
-        description: 'Business email address only (no free email domains)',
+        description: {
+          ar: "عنوان البريد الإلكتروني للعمل فقط (لا يقبل عناوين البريد الإلكتروني المجانية)",
+          en: "Business email address only (no free email domains)"
+        },
       },
       validate: (value) => {
         // Check for free email domains
@@ -188,10 +243,17 @@ export const Companies: CollectionConfig = {
     {
       name: 'primaryContactPhone',
       type: 'text',
+      label: {
+        ar: "رقم هاتف جهة الاتصال",
+        en: "Primary Contact Phone"
+      },
       required: true,
       admin: {
         placeholder: '+966501234567',
-        description: 'Phone number (9-15 digits, optional + at start)',
+        description: {
+          ar: "رقم الهاتف (9-15 رقم، + اختياري في البداية)",
+          en: "Phone number (9-15 digits, optional + at start)"
+        },
       },
       validate: (value) => {
         // Remove spaces and dashes for validation
@@ -209,31 +271,52 @@ export const Companies: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
+      label: {
+        ar: "الحالة",
+        en: "Status"
+      },
       required: true,
       defaultValue: 'active',
       options: [
-        { label: 'Active', value: 'active' },
-        { label: 'Inactive', value: 'inactive' },
-        { label: 'Suspended', value: 'suspended' },
-        { label: 'Pending Verification', value: 'pending' },
+        { label: { ar: "نشط", en: "Active" }, value: 'active' },
+        { label: { ar: "غير نشط", en: "Inactive" }, value: 'inactive' },
+        { label: { ar: "معلق", en: "Suspended" }, value: 'suspended' },
+        { label: { ar: "قيد التحقق", en: "Pending Verification" }, value: 'pending' },
       ],
       admin: {
         position: 'sidebar',
+        components: {
+          Cell: "/components/client/statusCell"
+        }
       },
     },
     {
       name: 'additionalInfo',
       type: 'group',
+      label: {
+        ar: "معلومات إضافية",
+        en: "Additional Information"
+      },
       admin: {
-        description: 'Additional company information',
+        description: {
+          ar: "معلومات إضافية عن الشركة",
+          en: "Additional company information"
+        },
       },
       fields: [
         {
           name: 'website',
           type: 'text',
+          label: {
+            ar: "الموقع الإلكتروني",
+            en: "Website"
+          },
           admin: {
             placeholder: 'https://company.com',
-            description: 'Company website URL',
+            description: {
+              ar: "رابط موقع الشركة",
+              en: "Company website URL"
+            },
           },
           validate: (value) => {
             if (value) {
@@ -249,9 +332,19 @@ export const Companies: CollectionConfig = {
         {
           name: 'taxNumber',
           type: 'text',
+          label: {
+            ar: "الرقم الضريبي",
+            en: "Tax Number"
+          },
           admin: {
-            placeholder: 'Tax/VAT number (10-15 digits)',
-            description: 'VAT registration number',
+            placeholder: {
+              ar: "رقم ضريبة القيمة المضافة (10-15 رقم)",
+              en: "Tax/VAT number (10-15 digits)"
+            },
+            description: {
+              ar: "رقم التسجيل الضريبي",
+              en: "VAT registration number"
+            },
           },
           validate: (value) => {
             if (value) {
@@ -270,11 +363,21 @@ export const Companies: CollectionConfig = {
         {
           name: 'commercialRegistration',
           type: 'text',
+          label: {
+            ar: "رقم السجل التجاري",
+            en: "Commercial Registration"
+          },
           required: true,
           unique: true,
           admin: {
-            placeholder: 'Commercial registration number (10-15 digits)',
-            description: 'CR Number - unique identifier',
+            placeholder: {
+              ar: "رقم السجل التجاري (10-15 رقم)",
+              en: "Commercial registration number (10-15 digits)"
+            },
+            description: {
+              ar: "رقم السجل التجاري - معرف فريد",
+              en: "CR Number - unique identifier"
+            },
           },
           validate: (value) => {
             if (!value || value.trim() === '') {
@@ -296,41 +399,79 @@ export const Companies: CollectionConfig = {
         {
           name: 'address',
           type: 'group',
+          label: {
+            ar: "العنوان",
+            en: "Address"
+          },
           fields: [
             {
               name: 'street',
               type: 'text',
+              label: {
+                ar: "الشارع",
+                en: "Street"
+              },
               maxLength: 300,
               localized: true,
               admin: {
-                placeholder: 'Street address',
-                description: 'Street address (max 300 characters)',
+                placeholder: {
+                  ar: "عنوان الشارع",
+                  en: "Street address"
+                },
+                description: {
+                  ar: "عنوان الشارع (حتى 300 حرف)",
+                  en: "Street address (max 300 characters)"
+                },
               },
             },
             {
               name: 'city',
               type: 'text',
+              label: {
+                ar: "المدينة",
+                en: "City"
+              },
               maxLength: 100,
               localized: true,
               admin: {
-                placeholder: 'City',
-                description: 'City name',
+                placeholder: {
+                  ar: "المدينة",
+                  en: "City"
+                },
+                description: {
+                  ar: "اسم المدينة",
+                  en: "City name"
+                },
               },
             },
             {
               name: 'postalCode',
               type: 'text',
+              label: {
+                ar: "الرمز البريدي",
+                en: "Postal Code"
+              },
               admin: {
-                placeholder: 'Postal code',
+                placeholder: {
+                  ar: "الرمز البريدي",
+                  en: "Postal code"
+                },
               },
             },
             {
               name: 'country',
               type: 'text',
+              label: {
+                ar: "الدولة",
+                en: "Country"
+              },
               defaultValue: 'Saudi Arabia',
               localized: true,
               admin: {
-                placeholder: 'Country',
+                placeholder: {
+                  ar: "الدولة",
+                  en: "Country"
+                },
               },
             },
           ],
@@ -341,9 +482,16 @@ export const Companies: CollectionConfig = {
     {
       name: 'notes',
       type: 'textarea',
+      label: {
+        ar: "ملاحظات",
+        en: "Notes"
+      },
       localized: true,
       admin: {
-        placeholder: 'Internal notes about this company (admin only)',
+        placeholder: {
+          ar: "ملاحظات داخلية حول هذه الشركة (للمدير فقط)",
+          en: "Internal notes about this company (admin only)"
+        },
         position: 'sidebar',
       },
     },

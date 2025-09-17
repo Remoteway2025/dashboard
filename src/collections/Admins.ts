@@ -3,8 +3,14 @@ import type { CollectionConfig } from 'payload'
 export const Users: CollectionConfig = {
   slug: 'users',
   labels: {
-    singular: "Admin",
-    plural: "Admins"
+    singular: {
+      ar: "المستخدم",
+      en: "Admin"
+    },
+    plural: {
+      ar: "المستخدمين",
+      en: "Admins"
+    }
   },
   admin: {
     useAsTitle: 'email',
@@ -47,15 +53,24 @@ export const Users: CollectionConfig = {
     {
       name: 'role',
       type: 'select',
-      label: 'Role',
+      label: {
+        ar: "الدور",
+        en: "Role"
+      },
       required: true,
       options: [
         {
-          label: 'Super Admin',
+          label: {
+            ar: "مدير عام",
+            en: "Super Admin"
+          },
           value: 'super admin',
         },
         {
-          label: 'Employer',
+          label: {
+            ar: "صاحب عمل",
+            en: "Employer"
+          },
           value: 'employer',
         },
       ],
@@ -63,11 +78,18 @@ export const Users: CollectionConfig = {
     {
       name: 'company',
       type: 'relationship',
+      label: {
+        ar: "الشركة",
+        en: "Company"
+      },
       relationTo: 'companies',
       required: true,
       admin: {
         condition: (data) => data?.role === 'employer',
-        description: 'The company this user belongs to',
+        description: {
+          ar: "الشركة التي ينتمي إليها هذا المستخدم",
+          en: "The company this user belongs to"
+        },
       },
       validate: (value, { data }) => {
         if (data?.role === 'employer' && !value) {
@@ -79,17 +101,31 @@ export const Users: CollectionConfig = {
     {
       name: 'firstName',
       type: 'text',
+      label: {
+        ar: "الاسم الأول",
+        en: "First Name"
+      },
       localized: true,
       admin: {
-        placeholder: 'First name',
+        placeholder: {
+          ar: "الاسم الأول",
+          en: "First name"
+        },
       },
     },
     {
       name: 'lastName',
       type: 'text',
+      label: {
+        ar: "الاسم الأخير",
+        en: "Last Name"
+      },
       localized: true,
       admin: {
-        placeholder: 'Last name',
+        placeholder: {
+          ar: "الاسم الأخير",
+          en: "Last name"
+        },
       },
     },
   ],

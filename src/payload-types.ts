@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     companies: Company;
     employees: Employee;
+    candidates: Candidate;
     'payroll-requests': PayrollRequest;
     payslips: Payslip;
     'audit-log': AuditLog;
@@ -95,6 +96,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     employees: EmployeesSelect<false> | EmployeesSelect<true>;
+    candidates: CandidatesSelect<false> | CandidatesSelect<true>;
     'payroll-requests': PayrollRequestsSelect<false> | PayrollRequestsSelect<true>;
     payslips: PayslipsSelect<false> | PayslipsSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
@@ -114,7 +116,7 @@ export interface Config {
   };
   globals: {};
   globalsSelect: {};
-  locale: 'en';
+  locale: 'en' | 'ar';
   user: User & {
     collection: 'users';
   };
@@ -160,6 +162,14 @@ export interface User {
   company?: (string | null) | Company;
   firstName?: string | null;
   lastName?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -252,6 +262,14 @@ export interface Company {
     };
   };
   notes?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -263,6 +281,14 @@ export interface Company {
 export interface Media {
   id: string;
   alt: string;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -281,6 +307,10 @@ export interface Media {
  */
 export interface Employee {
   id: string;
+  /**
+   * Employee profile picture
+   */
+  avatar?: (string | null) | Media;
   /**
    * Company this employee is assigned to
    */
@@ -364,9 +394,228 @@ export interface Employee {
    * Employee status
    */
   status: 'active' | 'inactive' | 'terminated';
+  /**
+   * Internal notes for administrative use
+   */
   notes?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "candidates".
+ */
+export interface Candidate {
+  id: string;
+  avatar?: (string | null) | Media;
+  name: string;
+  /**
+   * Desired or current job title
+   */
+  jobTitle: string;
+  /**
+   * Employment type preferences
+   */
+  employmentPreferences?: {
+    fullTime?: boolean | null;
+    partTime?: boolean | null;
+    both?: boolean | null;
+  };
+  /**
+   * Basic salary expectation (SAR)
+   */
+  basicSalary: number;
+  /**
+   * Work experience history
+   */
+  experiences?:
+    | {
+        title: string;
+        company: string;
+        employmentType: 'full_time' | 'part_time' | 'contract' | 'freelance' | 'internship';
+        startDate: string;
+        currentlyWorking?: boolean | null;
+        endDate?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Technical skills and technologies
+   */
+  skills?:
+    | (
+        | 'javascript'
+        | 'typescript'
+        | 'python'
+        | 'java'
+        | 'c_'
+        | 'c__'
+        | 'go'
+        | 'rust'
+        | 'ruby'
+        | 'php'
+        | 'react'
+        | 'angular'
+        | 'vue_js'
+        | 'next_js'
+        | 'node_js'
+        | 'express_js'
+        | 'django'
+        | 'flask'
+        | 'spring_boot'
+        | '_net'
+        | 'laravel'
+        | 'rails'
+        | 'fastapi'
+        | 'android'
+        | 'ios'
+        | 'react_native'
+        | 'flutter'
+        | 'swift'
+        | 'kotlin'
+        | 'aws'
+        | 'azure'
+        | 'google_cloud'
+        | 'docker'
+        | 'kubernetes'
+        | 'jenkins'
+        | 'ci/cd'
+        | 'mongodb'
+        | 'postgresql'
+        | 'mysql'
+        | 'redis'
+        | 'elasticsearch'
+        | 'oracle'
+        | 'git'
+        | 'rest_api'
+        | 'graphql'
+        | 'microservices'
+        | 'devops'
+        | 'agile'
+        | 'scrum'
+        | 'html'
+        | 'css'
+        | 'sass'
+        | 'tailwind_css'
+        | 'bootstrap'
+        | 'machine_learning'
+        | 'ai'
+        | 'data_science'
+        | 'tensorflow'
+        | 'pytorch'
+        | 'blockchain'
+        | 'web3'
+        | 'solidity'
+        | 'smart_contracts'
+      )[]
+    | null;
+  /**
+   * Language proficiencies
+   */
+  languages?:
+    | {
+        language:
+          | 'arabic'
+          | 'english'
+          | 'french'
+          | 'spanish'
+          | 'german'
+          | 'hindi'
+          | 'urdu'
+          | 'bengali'
+          | 'chinese'
+          | 'other';
+        fluencyLevel: 'native' | 'fluent' | 'advanced' | 'intermediate' | 'basic';
+        id?: string | null;
+      }[]
+    | null;
+  nationality:
+    | 'saudi'
+    | 'emirati'
+    | 'kuwaiti'
+    | 'qatari'
+    | 'bahraini'
+    | 'omani'
+    | 'egyptian'
+    | 'jordanian'
+    | 'lebanese'
+    | 'syrian'
+    | 'iraqi'
+    | 'yemeni'
+    | 'indian'
+    | 'pakistani'
+    | 'bangladeshi'
+    | 'filipino'
+    | 'indonesian'
+    | 'malaysian'
+    | 'american'
+    | 'british'
+    | 'canadian'
+    | 'australian'
+    | 'german'
+    | 'french'
+    | 'italian'
+    | 'spanish'
+    | 'dutch'
+    | 'other';
+  country:
+    | 'saudi_arabia'
+    | 'united_arab_emirates'
+    | 'kuwait'
+    | 'qatar'
+    | 'bahrain'
+    | 'oman'
+    | 'egypt'
+    | 'jordan'
+    | 'lebanon'
+    | 'syria'
+    | 'iraq'
+    | 'yemen'
+    | 'india'
+    | 'pakistan'
+    | 'bangladesh'
+    | 'philippines'
+    | 'indonesia'
+    | 'malaysia'
+    | 'united_states'
+    | 'united_kingdom'
+    | 'canada'
+    | 'australia'
+    | 'germany'
+    | 'france'
+    | 'italy'
+    | 'spain'
+    | 'netherlands'
+    | 'other';
+  /**
+   * Candidate status in recruitment process
+   */
+  status: 'available' | 'assigned' | 'selected' | 'rejected';
+  /**
+   * Company candidate is assigned to
+   */
+  company?: (string | null) | Company;
+  notes?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -374,7 +623,6 @@ export interface Employee {
  */
 export interface PayrollRequest {
   id: string;
-  title?: string | null;
   /**
    * Company requesting payroll processing
    */
@@ -384,9 +632,37 @@ export interface PayrollRequest {
    */
   payrollPeriod: string;
   /**
-   * Number of employees in this payroll (auto-calculated)
+   * Additional deductions for specific employees this month (maximum 50 employees for optimal performance)
    */
-  employeesCount?: number | null;
+  employeeDeductions?:
+    | {
+        /**
+         * Select employee for deductions
+         */
+        employee: string | Employee;
+        deductions: {
+          type: 'gosi_percentage' | 'fixed_amount';
+          /**
+           * Percentage of basic salary (0-99%)
+           */
+          gosiPercentage?: number | null;
+          /**
+           * Fixed deduction amount (cannot exceed basic salary)
+           */
+          fixedAmount?: number | null;
+          /**
+           * Reason for deduction (max 10 characters)
+           */
+          reason?: string | null;
+          /**
+           * Auto-calculated deduction amount
+           */
+          calculatedAmount?: number | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Payroll totals and summary
    */
@@ -413,13 +689,13 @@ export interface PayrollRequest {
     totalNetPay?: number | null;
   };
   /**
-   * Total amount for this payroll request (same as total net pay)
-   */
-  totalAmount?: number | null;
-  /**
    * Current status of the payroll request
    */
   status: 'new' | 'under_review' | 'approved' | 'rejected' | 'invoice_generated' | 'processed';
+  /**
+   * Reason for rejecting this payroll request
+   */
+  rejectionReason?: string | null;
   /**
    * User who submitted this payroll request
    */
@@ -433,17 +709,29 @@ export interface PayrollRequest {
    */
   reviewedAt?: string | null;
   /**
-   * Reason for rejecting this payroll request
-   */
-  rejectionReason?: string | null;
-  /**
    * Generated invoice number
    */
   invoiceNumber?: string | null;
   /**
+   * Total amount for this payroll request (same as total net pay)
+   */
+  totalAmount?: number | null;
+  /**
+   * Number of employees in this payroll (auto-calculated)
+   */
+  employeesCount?: number | null;
+  /**
    * Internal notes about this payroll request
    */
   notes?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -485,15 +773,30 @@ export interface Payslip {
      */
     allowances?: number | null;
     /**
-     * Total deductions
+     * Base deductions from employee profile
      */
-    deductions?: number | null;
+    baseDeductions?: number | null;
+    /**
+     * Month-specific additional deductions
+     */
+    additionalDeductions?:
+      | {
+          type?: string | null;
+          description?: string | null;
+          amount?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Total of all deductions (base + additional)
+     */
+    totalDeductions?: number | null;
     /**
      * Gross pay (Basic + Allowances)
      */
     grossPay?: number | null;
     /**
-     * Net pay (Gross - Deductions)
+     * Net pay (Gross - Total Deductions)
      */
     netPay: number;
     /**
@@ -525,6 +828,14 @@ export interface Payslip {
    * Internal notes about this payslip
    */
   notes?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -580,6 +891,14 @@ export interface AuditLog {
    * Category of the action
    */
   category: 'auth' | 'payroll' | 'employee' | 'company' | 'system' | 'export' | 'financial';
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -589,34 +908,62 @@ export interface AuditLog {
  */
 export interface Ticket {
   id: string;
+  /**
+   * Auto-generated unique identifier for the ticket
+   */
   ticketId: string;
   /**
    * The company that created this ticket
    */
   company: string | Company;
   /**
-   * The user who created this ticket
+   * Ticket title (max 150 characters)
    */
-  createdBy: string | User;
   subject: string;
+  /**
+   * Type of ticket or issue
+   */
   type: 'technical' | 'payroll' | 'contract' | 'other';
+  /**
+   * Priority level of the ticket
+   */
   priority: 'low' | 'medium' | 'high';
+  /**
+   * Current status of the ticket
+   */
   status: 'new' | 'in_progress' | 'resolved' | 'closed';
+  /**
+   * Detailed description of the issue (max 1000 characters)
+   */
   description: string;
   /**
    * Maximum 3 files, up to 10MB each
    */
   attachments?:
     | {
+        /**
+         * Allowed files: PDF, Word, Excel, JPEG, PNG
+         */
         file: string | Media;
         id?: string | null;
       }[]
     | null;
+  /**
+   * All messages associated with this ticket
+   */
   messages?: {
     docs?: (string | TicketMessage)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -626,8 +973,17 @@ export interface Ticket {
  */
 export interface TicketMessage {
   id: string;
+  /**
+   * The ticket associated with this message
+   */
   ticket: string | Ticket;
+  /**
+   * The user who sent this message
+   */
   sender: string | User;
+  /**
+   * Message content (max 1000 characters)
+   */
   message: string;
   /**
    * Internal notes are only visible to admins
@@ -638,11 +994,25 @@ export interface TicketMessage {
    */
   attachments?:
     | {
+        /**
+         * Allowed files: PDF, Word, Excel, JPEG, PNG
+         */
         file: string | Media;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Whether this message has been read
+   */
   isRead?: boolean | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -657,23 +1027,9 @@ export interface Notification {
    */
   title: string;
   /**
-   * Detailed message content (max 500 characters)
+   * Detailed message content (max 2000 characters)
    */
-  message: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
+  message: string;
   /**
    * Who should receive this notification
    */
@@ -683,11 +1039,21 @@ export interface Notification {
    */
   recipients?: (string | Company)[] | null;
   /**
-   * Admin who sent this notification
+   * Notification status
    */
-  sentBy: string | User;
   status: 'draft' | 'sent' | 'failed';
+  /**
+   * Date and time when the notification was sent
+   */
   sentAt?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -735,6 +1101,14 @@ export interface NotificationRecipient {
         id?: string | null;
       }[]
     | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -760,13 +1134,7 @@ export interface ContactUs {
    * Job title or position (max 100 characters)
    */
   jobTitle: string;
-  /**
-   * Size of the company by employee count
-   */
   companySize: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
-  /**
-   * Preferred method of contact
-   */
   contactMethod: 'email' | 'phone' | 'video';
   /**
    * Additional message or information (max 1000 characters)
@@ -795,6 +1163,14 @@ export interface ContactUs {
    * Admin who closed this inquiry
    */
   closedBy?: (string | null) | User;
+  createdBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: string | User;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -810,7 +1186,7 @@ export interface Export {
   page?: number | null;
   sort?: string | null;
   sortOrder?: ('asc' | 'desc') | null;
-  locale?: ('all' | 'en') | null;
+  locale?: ('all' | 'en' | 'ar') | null;
   drafts?: ('yes' | 'no') | null;
   selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
   fields?: string[] | null;
@@ -952,6 +1328,10 @@ export interface PayloadLockedDocument {
         value: string | Employee;
       } | null)
     | ({
+        relationTo: 'candidates';
+        value: string | Candidate;
+      } | null)
+    | ({
         relationTo: 'payroll-requests';
         value: string | PayrollRequest;
       } | null)
@@ -1042,6 +1422,8 @@ export interface UsersSelect<T extends boolean = true> {
   company?: T;
   firstName?: T;
   lastName?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1065,6 +1447,8 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1106,6 +1490,8 @@ export interface CompaniesSelect<T extends boolean = true> {
             };
       };
   notes?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1115,6 +1501,7 @@ export interface CompaniesSelect<T extends boolean = true> {
  * via the `definition` "employees_select".
  */
 export interface EmployeesSelect<T extends boolean = true> {
+  avatar?: T;
   company?: T;
   fullName?: T;
   employeeId?: T;
@@ -1145,18 +1532,81 @@ export interface EmployeesSelect<T extends boolean = true> {
       };
   status?: T;
   notes?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "candidates_select".
+ */
+export interface CandidatesSelect<T extends boolean = true> {
+  avatar?: T;
+  name?: T;
+  jobTitle?: T;
+  employmentPreferences?:
+    | T
+    | {
+        fullTime?: T;
+        partTime?: T;
+        both?: T;
+      };
+  basicSalary?: T;
+  experiences?:
+    | T
+    | {
+        title?: T;
+        company?: T;
+        employmentType?: T;
+        startDate?: T;
+        currentlyWorking?: T;
+        endDate?: T;
+        description?: T;
+        id?: T;
+      };
+  skills?: T;
+  languages?:
+    | T
+    | {
+        language?: T;
+        fluencyLevel?: T;
+        id?: T;
+      };
+  nationality?: T;
+  country?: T;
+  status?: T;
+  company?: T;
+  notes?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payroll-requests_select".
  */
 export interface PayrollRequestsSelect<T extends boolean = true> {
-  title?: T;
   company?: T;
   payrollPeriod?: T;
-  employeesCount?: T;
+  employeeDeductions?:
+    | T
+    | {
+        employee?: T;
+        deductions?:
+          | T
+          | {
+              type?: T;
+              gosiPercentage?: T;
+              fixedAmount?: T;
+              reason?: T;
+              calculatedAmount?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   payrollSummary?:
     | T
     | {
@@ -1166,14 +1616,17 @@ export interface PayrollRequestsSelect<T extends boolean = true> {
         totalGrossPay?: T;
         totalNetPay?: T;
       };
-  totalAmount?: T;
   status?: T;
+  rejectionReason?: T;
   submittedBy?: T;
   reviewedBy?: T;
   reviewedAt?: T;
-  rejectionReason?: T;
   invoiceNumber?: T;
+  totalAmount?: T;
+  employeesCount?: T;
   notes?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1192,7 +1645,16 @@ export interface PayslipsSelect<T extends boolean = true> {
     | {
         basicSalary?: T;
         allowances?: T;
-        deductions?: T;
+        baseDeductions?: T;
+        additionalDeductions?:
+          | T
+          | {
+              type?: T;
+              description?: T;
+              amount?: T;
+              id?: T;
+            };
+        totalDeductions?: T;
         grossPay?: T;
         netPay?: T;
         iban?: T;
@@ -1203,6 +1665,8 @@ export interface PayslipsSelect<T extends boolean = true> {
   pdfGenerated?: T;
   pdfUrl?: T;
   notes?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1220,6 +1684,8 @@ export interface AuditLogSelect<T extends boolean = true> {
   userAgent?: T;
   severity?: T;
   category?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1230,7 +1696,6 @@ export interface AuditLogSelect<T extends boolean = true> {
 export interface TicketsSelect<T extends boolean = true> {
   ticketId?: T;
   company?: T;
-  createdBy?: T;
   subject?: T;
   type?: T;
   priority?: T;
@@ -1243,6 +1708,8 @@ export interface TicketsSelect<T extends boolean = true> {
         id?: T;
       };
   messages?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1262,6 +1729,8 @@ export interface TicketMessagesSelect<T extends boolean = true> {
         id?: T;
       };
   isRead?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1274,9 +1743,10 @@ export interface NotificationsSelect<T extends boolean = true> {
   message?: T;
   recipientType?: T;
   recipients?: T;
-  sentBy?: T;
   status?: T;
   sentAt?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1299,6 +1769,8 @@ export interface NotificationRecipientsSelect<T extends boolean = true> {
         readAt?: T;
         id?: T;
       };
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1325,6 +1797,8 @@ export interface ContactUsSelect<T extends boolean = true> {
       };
   closedAt?: T;
   closedBy?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1432,7 +1906,7 @@ export interface TaskCreateCollectionExport {
     page?: number | null;
     sort?: string | null;
     sortOrder?: ('asc' | 'desc') | null;
-    locale?: ('all' | 'en') | null;
+    locale?: ('all' | 'en' | 'ar') | null;
     drafts?: ('yes' | 'no') | null;
     selectionToUse?: ('currentSelection' | 'currentFilters' | 'all') | null;
     fields?: string[] | null;

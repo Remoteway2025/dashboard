@@ -2,8 +2,18 @@ import type { CollectionConfig } from 'payload'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
+  labels: {
+    singular: {
+      ar: "تذكرة",
+      en: "Ticket"
+    },
+    plural: {
+      ar: "التذاكر",
+      en: "Tickets"
+    }
+  },
   admin: {
-    useAsTitle: 'subject',
+    useAsTitle: 'ticketId',
     defaultColumns: ['ticketId', 'company', 'subject', 'type', 'status', 'createdAt', 'updatedAt'],
     listSearchableFields: ['ticketId', 'subject', 'description'],
   },
@@ -15,11 +25,19 @@ export const Tickets: CollectionConfig = {
     {
       name: 'ticketId',
       type: 'text',
+      label: {
+        ar: "رقم التذكرة",
+        en: "Ticket ID"
+      },
       required: true,
       unique: true,
       admin: {
         readOnly: true,
         position: 'sidebar',
+        description: {
+          ar: "رقم فريد مولد تلقائياً للتذكرة",
+          en: "Auto-generated unique identifier for the ticket"
+        },
       },
       hooks: {
         beforeValidate: [
@@ -42,107 +60,184 @@ export const Tickets: CollectionConfig = {
       },
     },
     {
-      name: 'company',
-      type: 'relationship',
-      relationTo: 'companies',
-      required: true,
-      admin: {
-        description: 'The company that created this ticket',
-      },
-    },
-    {
-      name: 'createdBy',
-      type: 'relationship',
-      relationTo: 'users',
-      required: true,
-      admin: {
-        description: 'The user who created this ticket',
-        readOnly: true,
-      },
-    },
-    {
-      name: 'subject',
-      type: 'text',
-      required: true,
-      maxLength: 150,
-      localized: true,
-      admin: {
-        placeholder: 'Brief description of the issue',
-      },
-    },
-    {
-      name: 'type',
-      type: 'select',
-      required: true,
-      options: [
+      type: "row",
+      fields: [
         {
-          label: 'Technical',
-          value: 'technical',
+          name: 'company',
+          type: 'relationship',
+          label: {
+            ar: "الشركة",
+            en: "Company"
+          },
+          relationTo: 'companies',
+          required: true,
+          admin: {
+            description: {
+              ar: "الشركة التي أنشأت هذه التذكرة",
+              en: "The company that created this ticket"
+            },
+          },
         },
         {
-          label: 'Payroll',
-          value: 'payroll',
+          name: 'subject',
+          type: 'text',
+          label: {
+            ar: "الموضوع",
+            en: "Subject"
+          },
+          required: true,
+          maxLength: 150,
+          localized: true,
+          admin: {
+            placeholder: {
+              ar: "وصف موجز للمشكلة",
+              en: "Brief description of the issue"
+            },
+            description: {
+              ar: "عنوان التذكرة (حتى 150 حرف)",
+              en: "Ticket title (max 150 characters)"
+            },
+          },
         },
         {
-          label: 'Contract',
-          value: 'contract',
+          name: 'type',
+          type: 'select',
+          label: {
+            ar: "النوع",
+            en: "Type"
+          },
+          required: true,
+          options: [
+            {
+              label: {
+                ar: "تقني",
+                en: "Technical"
+              },
+              value: 'technical',
+            },
+            {
+              label: {
+                ar: "رواتب",
+                en: "Payroll"
+              },
+              value: 'payroll',
+            },
+            {
+              label: {
+                ar: "عقد",
+                en: "Contract"
+              },
+              value: 'contract',
+            },
+            {
+              label: {
+                ar: "أخرى",
+                en: "Other"
+              },
+              value: 'other',
+            },
+          ],
+          admin: {
+            description: {
+              ar: "نوع التذكرة أو المشكلة",
+              en: "Type of ticket or issue"
+            },
+          },
         },
         {
-          label: 'Other',
-          value: 'other',
+          name: 'priority',
+          type: 'select',
+          label: {
+            ar: "الأولوية",
+            en: "Priority"
+          },
+          required: true,
+          options: [
+            {
+              label: {
+                ar: "منخفضة",
+                en: "Low"
+              },
+              value: 'low',
+            },
+            {
+              label: {
+                ar: "متوسطة",
+                en: "Medium"
+              },
+              value: 'medium',
+            },
+            {
+              label: {
+                ar: "عالية",
+                en: "High"
+              },
+              value: 'high',
+            },
+          ],
+          admin: {
+            description: {
+              ar: "مستوى أولوية التذكرة",
+              en: "Priority level of the ticket"
+            },
+          },
+          access: {
+            create: ({ req: { user } }) => {
+              if (user?.role === 'employer') return false
+              return true
+            },
+          },
         },
-      ],
-    },
-    {
-      name: 'priority',
-      type: 'select',
-      required: true,
-      options: [
-        {
-          label: 'Low',
-          value: 'low',
-        },
-        {
-          label: 'Medium',
-          value: 'medium',
-        },
-        {
-          label: 'High',
-          value: 'high',
-        },
-      ],
-      access: {
-        create: ({ req: { user } }) => {
-          if (user?.role === 'employer') return false
-          return true
-        },
-      },
+      ]
     },
     {
       name: 'status',
       type: 'select',
+      label: {
+        ar: "الحالة",
+        en: "Status"
+      },
       required: true,
       defaultValue: 'new',
       options: [
         {
-          label: 'New',
+          label: {
+            ar: "جديدة",
+            en: "New"
+          },
           value: 'new',
         },
         {
-          label: 'In Progress',
+          label: {
+            ar: "قيد المعالجة",
+            en: "In Progress"
+          },
           value: 'in_progress',
         },
         {
-          label: 'Resolved',
+          label: {
+            ar: "محلولة",
+            en: "Resolved"
+          },
           value: 'resolved',
         },
         {
-          label: 'Closed',
+          label: {
+            ar: "مغلقة",
+            en: "Closed"
+          },
           value: 'closed',
         },
       ],
       admin: {
         position: 'sidebar',
+        description: {
+          ar: "حالة التذكرة الحالية",
+          en: "Current status of the ticket"
+        },
+        components: {
+          Cell: "/components/client/statusCell"
+        }
       },
       access: {
         create: ({ req: { user } }) => {
@@ -154,26 +249,55 @@ export const Tickets: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+      label: {
+        ar: "الوصف",
+        en: "Description"
+      },
       required: true,
       maxLength: 1000,
       localized: true,
       admin: {
-        placeholder: 'Detailed description of the issue',
+        placeholder: {
+          ar: "وصف تفصيلي للمشكلة",
+          en: "Detailed description of the issue"
+        },
+        description: {
+          ar: "وصف مفصل للمشكلة (حتى 1000 حرف)",
+          en: "Detailed description of the issue (max 1000 characters)"
+        },
+        rows: 4
       },
     },
     {
       name: 'attachments',
       type: 'array',
+      label: {
+        ar: "المرفقات",
+        en: "Attachments"
+      },
       admin: {
-        description: 'Maximum 3 files, up to 10MB each',
+        description: {
+          ar: "حد أقصى 3 ملفات، حتى 10 ميجابايت لكل ملف",
+          en: "Maximum 3 files, up to 10MB each"
+        },
       },
       maxRows: 3,
       fields: [
         {
           name: 'file',
           type: 'upload',
+          label: {
+            ar: "الملف",
+            en: "File"
+          },
           relationTo: 'media',
           required: true,
+          admin: {
+            description: {
+              ar: "الملفات المسموحة: PDF, Word, Excel, JPEG, PNG",
+              en: "Allowed files: PDF, Word, Excel, JPEG, PNG"
+            },
+          },
           filterOptions: {
             mimeType: {
               in: [
@@ -190,10 +314,19 @@ export const Tickets: CollectionConfig = {
     },
     {
       name: "messages",
-      label: "Thread",
+      label: {
+        ar: "سلسلة الرسائل",
+        en: "Thread"
+      },
       type: "join",
       collection: "ticket-messages",
-      on: "ticket"
+      on: "ticket",
+      admin: {
+        description: {
+          ar: "جميع الرسائل المرتبطة بهذه التذكرة",
+          en: "All messages associated with this ticket"
+        },
+      },
     },
   ],
   access: {
@@ -234,23 +367,12 @@ export const Tickets: CollectionConfig = {
       async ({ data, req, operation, originalDoc }) => {
         // Auto-set createdBy and company for new tickets
         if (operation === 'create') {
-          data.createdBy = req.user.id
-          if (req.user.role === 'employer' && req.user.company) {
+
+          if (req?.user?.role === 'employer' && req.user.company) {
             data.company = req.user.company?.id || req.user.company
           }
         }
 
-        // Track status changes
-        if (operation === 'update' && originalDoc && data.status !== originalDoc.status) {
-          if (!data.statusHistory) {
-            data.statusHistory = originalDoc.statusHistory || []
-          }
-          data.statusHistory.push({
-            status: data.status,
-            changedBy: req.user.id,
-            changedAt: new Date().toISOString(),
-          })
-        }
         return data
       },
     ],

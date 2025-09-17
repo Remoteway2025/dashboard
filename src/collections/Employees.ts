@@ -3,12 +3,18 @@ import type { CollectionConfig } from 'payload'
 export const Employees: CollectionConfig = {
   slug: 'employees',
   labels: {
-    singular: 'Employee',
-    plural: 'Employees'
+    singular: {
+      ar: "موظف",
+      en: "Employee"
+    },
+    plural: {
+      ar: "الموظفين",
+      en: "Employees"
+    }
   },
   admin: {
     useAsTitle: 'fullName',
-    defaultColumns: ['fullName', 'employeeId', 'jobTitle', 'company', 'netSalary', 'status'],
+    defaultColumns: ['avatar', 'fullName', 'employeeId', 'jobTitle', 'company', 'status'],
     listSearchableFields: ['fullName', 'employeeId', 'nationalId'],
   },
   timestamps: true,
@@ -52,31 +58,24 @@ export const Employees: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
-      async ({ data, req, operation }) => {
+      async ({ data, req, operation, originalDoc }) => {
         // Validate Employee ID uniqueness within company
-        if (operation === 'create' || (operation === 'update' && data.employeeId)) {
+        if (data?.employeeId && data.company) {
           const payload = req.payload
+
+          const whereConditions: any = {
+            employeeId: { equals: data.employeeId },
+            company: { equals: data.company },
+          }
+
+          // For updates, exclude the current document
+          if (operation === 'update' && originalDoc?.id) {
+            whereConditions.id = { not_equals: originalDoc.id }
+          }
+
           const existingEmployee = await payload.find({
             collection: 'employees',
-            where: {
-              and: [
-                {
-                  employeeId: {
-                    equals: data.employeeId,
-                  },
-                },
-                {
-                  company: {
-                    equals: data.company,
-                  },
-                },
-                ...(operation === 'update' ? [{
-                  id: {
-                    not_equals: req.id,
-                  },
-                }] : []),
-              ],
-            },
+            where: whereConditions,
             limit: 1,
           })
 
@@ -134,12 +133,38 @@ export const Employees: CollectionConfig = {
   },
   fields: [
     {
+      name: 'avatar',
+      type: 'upload',
+      label: {
+        ar: "الصورة الشخصية",
+        en: "Avatar"
+      },
+      relationTo: 'media',
+      admin: {
+        position: 'sidebar',
+        description: {
+          ar: "صورة الملف الشخصي للموظف",
+          en: "Employee profile picture"
+        },
+        components: {
+          Cell: "/components/server/imageThumbnailWrapper"
+        }
+      },
+    },
+    {
       name: 'company',
       type: 'relationship',
+      label: {
+        ar: "الشركة",
+        en: "Company"
+      },
       relationTo: 'companies',
       required: true,
       admin: {
-        description: 'Company this employee is assigned to',
+        description: {
+          ar: "الشركة المعين إليها هذا الموظف",
+          en: "Company this employee is assigned to"
+        },
       },
       filterOptions: {
         status: {
@@ -150,31 +175,61 @@ export const Employees: CollectionConfig = {
     {
       name: 'fullName',
       type: 'text',
+      label: {
+        ar: "الاسم الكامل",
+        en: "Full Name"
+      },
       required: true,
       maxLength: 200,
       localized: true,
       admin: {
-        placeholder: 'Enter full name',
-        description: 'Employee full name (max 200 characters)',
+        placeholder: {
+          ar: "أدخل الاسم الكامل",
+          en: "Enter full name"
+        },
+        description: {
+          ar: "الاسم الكامل للموظف (حتى 200 حرف)",
+          en: "Employee full name (max 200 characters)"
+        },
       },
     },
     {
       name: 'employeeId',
       type: 'text',
+      label: {
+        ar: "رقم الموظف",
+        en: "Employee ID"
+      },
       required: true,
       maxLength: 50,
       admin: {
-        placeholder: 'Enter employee ID',
-        description: 'Unique employee ID within the company',
+        placeholder: {
+          ar: "أدخل رقم الموظف",
+          en: "Enter employee ID"
+        },
+        description: {
+          ar: "رقم موظف فريد داخل الشركة",
+          en: "Unique employee ID within the company"
+        },
       },
     },
     {
       name: 'nationalId',
       type: 'text',
+      label: {
+        ar: "رقم الهوية",
+        en: "National ID"
+      },
       required: true,
       admin: {
-        placeholder: 'Enter National ID or Iqama number',
-        description: 'National ID or Iqama number (10-15 digits)',
+        placeholder: {
+          ar: "أدخل رقم الهوية أو الإقامة",
+          en: "Enter National ID or Iqama number"
+        },
+        description: {
+          ar: "رقم الهوية أو الإقامة (10-15 رقم)",
+          en: "National ID or Iqama number (10-15 digits)"
+        },
       },
       validate: (value) => {
         if (!value || value.trim() === '') {
@@ -196,27 +251,51 @@ export const Employees: CollectionConfig = {
     {
       name: 'jobTitle',
       type: 'text',
+      label: {
+        ar: "المسمى الوظيفي",
+        en: "Job Title"
+      },
       required: true,
       maxLength: 100,
       localized: true,
       admin: {
-        placeholder: 'Enter job title/position',
-        description: 'Employee job title or position',
+        placeholder: {
+          ar: "أدخل المسمى الوظيفي",
+          en: "Enter job title/position"
+        },
+        description: {
+          ar: "المسمى الوظيفي أو المنصب",
+          en: "Employee job title or position"
+        },
       },
     },
     {
       name: 'contractInfo',
       type: 'group',
+      label: {
+        ar: "معلومات العقد",
+        en: "Contract Information"
+      },
       admin: {
-        description: 'Employment contract information',
+        description: {
+          ar: "معلومات عقد التوظيف",
+          en: "Employment contract information"
+        },
       },
       fields: [
         {
           name: 'startDate',
           type: 'date',
+          label: {
+            ar: "تاريخ بداية العقد",
+            en: "Start Date"
+          },
           required: true,
           admin: {
-            description: 'Contract start date (not more than 30 days in future)',
+            description: {
+              ar: "تاريخ بداية العقد (لا يزيد عن 30 يوم في المستقبل)",
+              en: "Contract start date (not more than 30 days in future)"
+            },
             date: {
               displayFormat: 'dd/MM/yyyy',
             },
@@ -241,8 +320,15 @@ export const Employees: CollectionConfig = {
         {
           name: 'endDate',
           type: 'date',
+          label: {
+            ar: "تاريخ نهاية العقد",
+            en: "End Date"
+          },
           admin: {
-            description: 'Contract end date (optional, must be after start date)',
+            description: {
+              ar: "تاريخ نهاية العقد (اختياري، يجب أن يكون بعد تاريخ البداية)",
+              en: "Contract end date (optional, must be after start date)"
+            },
             date: {
               displayFormat: 'dd/MM/yyyy',
             },
@@ -262,9 +348,16 @@ export const Employees: CollectionConfig = {
         {
           name: 'autoRenew',
           type: 'checkbox',
+          label: {
+            ar: "تجديد تلقائي",
+            en: "Auto Renew"
+          },
           defaultValue: false,
           admin: {
-            description: 'Automatically renew contract when it expires',
+            description: {
+              ar: "تجديد العقد تلقائياً عند انتهاء صلاحيته",
+              en: "Automatically renew contract when it expires"
+            },
           },
         },
       ],
@@ -272,69 +365,121 @@ export const Employees: CollectionConfig = {
     {
       name: 'payrollInfo',
       type: 'group',
+      label: {
+        ar: "معلومات الرواتب",
+        en: "Payroll Information"
+      },
       admin: {
-        description: 'Salary and payroll information',
+        description: {
+          ar: "معلومات الراتب والرواتب",
+          en: "Salary and payroll information"
+        },
       },
       fields: [
         {
           name: 'basicSalary',
           type: 'number',
+          label: {
+            ar: "الراتب الأساسي",
+            en: "Basic Salary"
+          },
           required: true,
           min: 0,
           admin: {
             placeholder: '0.00',
-            description: 'Basic monthly salary in SAR',
+            description: {
+              ar: "الراتب الشهري الأساسي بالريال السعودي",
+              en: "Basic monthly salary in SAR"
+            },
             step: 0.01,
           },
         },
         {
           name: 'allowances',
           type: 'number',
+          label: {
+            ar: "البدلات",
+            en: "Allowances"
+          },
           defaultValue: 0,
           min: 0,
           admin: {
             placeholder: '0.00',
-            description: 'Monthly allowances in SAR',
+            description: {
+              ar: "البدلات الشهرية بالريال السعودي",
+              en: "Monthly allowances in SAR"
+            },
             step: 0.01,
           },
         },
         {
           name: 'deductions',
           type: 'number',
+          label: {
+            ar: "الاستقطاعات",
+            en: "Deductions"
+          },
           defaultValue: 0,
           min: 0,
           admin: {
+            hidden: true,
             placeholder: '0.00',
-            description: 'Monthly deductions in SAR',
+            description: {
+              ar: "الاستقطاعات الشهرية بالريال السعودي",
+              en: "Monthly deductions in SAR"
+            },
             step: 0.01,
           },
         },
         {
           name: 'grossPay',
           type: 'number',
+          label: {
+            ar: "الراتب الإجمالي",
+            en: "Gross Pay"
+          },
           admin: {
+            hidden: true,
             readOnly: true,
-            description: 'Gross Pay = Basic Salary + Allowances (auto-calculated)',
+            description: {
+              ar: "الراتب الإجمالي = الراتب الأساسي + البدلات (محسوب تلقائياً)",
+              en: "Gross Pay = Basic Salary + Allowances (auto-calculated)"
+            },
             step: 0.01,
           },
         },
         {
           name: 'netSalary',
           type: 'number',
+          label: {
+            ar: "الراتب الصافي",
+            en: "Net Salary"
+          },
           admin: {
+            hidden: true,
             readOnly: true,
-            description: 'Net Salary = Gross Pay - Deductions (auto-calculated)',
+            description: {
+              ar: "الراتب الصافي = الراتب الإجمالي - الاستقطاعات (محسوب تلقائياً)",
+              en: "Net Salary = Gross Pay - Deductions (auto-calculated)"
+            },
             step: 0.01,
           },
         },
         {
           name: 'iban',
           type: 'text',
+          label: {
+            ar: "رقم الآيبان",
+            en: "IBAN"
+          },
           required: true,
           maxLength: 24,
           admin: {
             placeholder: 'SA0000000000000000000000',
-            description: 'Saudi IBAN (24 characters starting with SA)',
+            description: {
+              ar: "رقم الآيبان السعودي (24 حرف يبدأ بـ SA)",
+              en: "Saudi IBAN (24 characters starting with SA)"
+            },
           },
           validate: (value) => {
             if (!value || value.trim() === '') {
@@ -366,24 +511,45 @@ export const Employees: CollectionConfig = {
     {
       name: 'contactInfo',
       type: 'group',
+      label: {
+        ar: "معلومات الاتصال",
+        en: "Contact Information"
+      },
       admin: {
-        description: 'Employee contact information',
+        description: {
+          ar: "معلومات الاتصال بالموظف",
+          en: "Employee contact information"
+        },
       },
       fields: [
         {
           name: 'email',
           type: 'email',
+          label: {
+            ar: "البريد الإلكتروني",
+            en: "Email"
+          },
           admin: {
             placeholder: 'employee@company.com',
-            description: 'Employee email address',
+            description: {
+              ar: "عنوان البريد الإلكتروني للموظف",
+              en: "Employee email address"
+            },
           },
         },
         {
           name: 'phone',
           type: 'text',
+          label: {
+            ar: "رقم الهاتف",
+            en: "Phone"
+          },
           admin: {
             placeholder: '+966501234567',
-            description: 'Employee phone number',
+            description: {
+              ar: "رقم هاتف الموظف",
+              en: "Employee phone number"
+            },
           },
           validate: (value) => {
             if (value) {
@@ -401,33 +567,63 @@ export const Employees: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
+      label: {
+        ar: "الحالة",
+        en: "Status"
+      },
       required: true,
       defaultValue: 'active',
       options: [
         {
-          label: 'Active',
+          label: {
+            ar: "نشط",
+            en: "Active"
+          },
           value: 'active',
         },
         {
-          label: 'Inactive',
+          label: {
+            ar: "غير نشط",
+            en: "Inactive"
+          },
           value: 'inactive',
         },
         {
-          label: 'Terminated',
+          label: {
+            ar: "منهي الخدمة",
+            en: "Terminated"
+          },
           value: 'terminated',
         },
       ],
       admin: {
         position: 'sidebar',
-        description: 'Employee status',
+        description: {
+          ar: "حالة الموظف",
+          en: "Employee status"
+        },
+        components: {
+          Cell: "/components/client/statusCell"
+        }
       },
     },
     {
       name: 'notes',
       type: 'textarea',
+      label: {
+        ar: "ملاحظات",
+        en: "Notes"
+      },
       localized: true,
       admin: {
-        placeholder: 'Internal notes about this employee',
+        placeholder: {
+          ar: "ملاحظات داخلية حول هذا الموظف",
+          en: "Internal notes about this employee"
+        },
+        description: {
+          ar: "ملاحظات داخلية للاستخدام الإداري",
+          en: "Internal notes for administrative use"
+        },
         position: 'sidebar',
         rows: 4,
       },

@@ -1,9 +1,11 @@
 /* Primary Button */
 @import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@tailwind utilities;
 
 body {
     font-family: "Rubik", sans-serif;
 }
+
 
 .btn--style-primary {
     border-radius: 9px;
@@ -17,27 +19,44 @@ body {
     border-radius: 9px;
 }
 
-.consultant-image {
-    border-radius: 20px;
+.table {
+    width: 100%;
 }
+
+.consultant-image {
+    border-radius: 10px;
+}
+
 
 .table th:first-child,
 .table td:first-child {
     padding-inline-start: 10px;
 }
 
-// button,
-// a,
-// .where-builder {
-//     //border-radius: 9px;
-// }
-
-// .pill {
-//     //border-radius: 9px !important;
-// }
-
 :root {
-     
+    /* Color Shades */
+    --color-base-0: #f4f4f4;
+    --color-base-50: #e8e8e8;
+    --color-base-100: #d6d6d6;
+    --color-base-150: #c4c4c4;
+    --color-base-200: #b2b2b2;
+    --color-base-250: #a0a0a0;
+    --color-base-300: #8e8e8e;
+    --color-base-350: #7c7c7c;
+    --color-base-400: #6a6a6a;
+    --color-base-450: #585858;
+    --color-base-500: #464646;
+    --color-base-550: #3a3a3a;
+    --color-base-600: #323232;
+    --color-base-650: #2a2a2a;
+    --color-base-700: #222222;
+    --color-base-750: #1e1e1e;
+    --color-base-800: #1a1a1a;
+    --color-base-850: #161616;
+    --color-base-900: #121212;
+    /* No change */
+
+
     --color-success-0: #ffffff;
     --color-success-50: #f1faf6;
     --color-success-100: #e3f5ed;
@@ -118,6 +137,20 @@ body {
     --color-accent-850: #62000a;
     --color-accent-900: #540009;
     --color-accent-950: #460007;
+
+    
+    --style-radius-l: 19px !important;
+}
+
+
+button,
+a,
+.where-builder {
+    border-radius: 9px !important;
+}
+
+.pill {
+    border-radius: 9px !important;
 }
 
 th {
@@ -149,12 +182,12 @@ td {
 
 .nav-group__label {
     font-weight: bold;
-    padding: 5px 0px 5px 10px;
+    padding: 5px 5px 5px 10px;
 }
 
 .nav-group__toggle {
-    border: 1px solid;
-    border-radius: 5px;
+    border: 2px solid;
+    border-radius: 10px;
 }
 
 .list-header__title-actions {
@@ -167,9 +200,18 @@ td {
     margin-right: 4px;
 }
 
+#search-filter-input::placeholder {
+  padding-right: 1%;
+}
+
+.search-bar {
+  border-radius: 15px !important;
+}
+
 .app-header__localizer.localizer {
     margin-right: 1rem;
-    border-radius: 19px;;
+    margin-left: 1rem;
+    border-radius: 30px !important;
 }
 
 .localizer-button {
@@ -217,9 +259,11 @@ label.field-label {
 .nav-group .nav__link[id*='nav-payroll-requests']::before,
 .nav-group .nav__link[id*='nav-payslips']::before,
 .nav-group .nav__link[id*='nav-notification']::before,
+.nav-group .nav__link[id*='nav-candidates']::before,
 .nav-group .nav__link[id*='nav-global-settings']::before {
     content: '';
     display: inline-block;
+    margin-left: 1.2rem;
     margin-right: 1.2rem;
     width: 20px;
     height: 20px;
@@ -249,7 +293,7 @@ label.field-label {
 }
 
 .nav-group .nav__link[id*='nav-user']::before {
-    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/user.svg');
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/shield-user.svg');
 }
 
 .nav-group .nav__link[id*='nav-contact-us']::before {
@@ -266,4 +310,8 @@ label.field-label {
 
 .nav-group .nav__link[id*='nav-payslips']::before {
     mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/wallet.svg');
+}
+
+.nav-group .nav__link[id*='nav-candidates']::before {
+    mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.508.0/icons/user-cog.svg');
 }

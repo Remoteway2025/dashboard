@@ -3,22 +3,37 @@ import type { CollectionConfig } from 'payload'
 export const Payslips: CollectionConfig = {
   slug: 'payslips',
   labels: {
-    singular: 'Payslip',
-    plural: 'Payslips'
+    singular: {
+      ar: "كشف راتب",
+      en: "Payslip"
+    },
+    plural: {
+      ar: "كشوف الرواتب",
+      en: "Payslips"
+    }
   },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['employee', 'company', 'payrollPeriod', 'netPay', 'status', 'createdAt'],
     listSearchableFields: ['employee', 'payrollPeriod'],
     description: 'Individual employee payslips',
-    group: 'Finance',
+    group: {
+      ar: "الماليه",
+      en: "Finance"
+    },
+    components: {
+      views: {
+        list: { Component: "/components/client/payslipsSearch" }
+      }
+    }
   },
   timestamps: true,
   access: {
     read: ({ req: { user } }) => {
-      if (!user) return false
-      if (user.role === 'super admin') return true
-      if (user.role === 'employer' && user.company) {
+
+      if (user?.role === 'super admin') return false
+
+      if (user?.role === 'employer' && user.company) {
         return {
           company: {
             equals: user.company?.id || user.company,
@@ -92,6 +107,10 @@ export const Payslips: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
+      label: {
+        ar: "العنوان",
+        en: "Title"
+      },
       admin: {
         hidden: true,
       },
@@ -112,40 +131,68 @@ export const Payslips: CollectionConfig = {
     {
       name: 'payrollRequest',
       type: 'relationship',
+      label: {
+        ar: "طلب الرواتب",
+        en: "Payroll Request"
+      },
       relationTo: 'payroll-requests',
       required: true,
       admin: {
-        description: 'Parent payroll request',
+        description: {
+          ar: "طلب الرواتب الأساسي",
+          en: "Parent payroll request"
+        },
         readOnly: true,
       },
     },
     {
       name: 'employee',
       type: 'relationship',
+      label: {
+        ar: "الموظف",
+        en: "Employee"
+      },
       relationTo: 'employees',
       required: true,
       admin: {
-        description: 'Employee for this payslip',
+        description: {
+          ar: "الموظف لهذا كشف الراتب",
+          en: "Employee for this payslip"
+        },
         readOnly: true,
       },
     },
     {
       name: 'company',
       type: 'relationship',
+      label: {
+        ar: "الشركة",
+        en: "Company"
+      },
       relationTo: 'companies',
       required: true,
       admin: {
-        description: 'Company that owns this payslip',
+        description: {
+          ar: "الشركة المالكة لهذا كشف الراتب",
+          en: "Company that owns this payslip"
+        },
         readOnly: true,
       },
     },
     {
       name: 'payrollPeriod',
       type: 'date',
+      label: {
+        ar: "فترة الرواتب",
+        en: "Payroll Period"
+      },
       required: true,
       admin: {
         readOnly: true,
-        description: 'Payroll period for this payslip',
+        description: {
+          ar: "فترة الرواتب لهذا كشف الراتب",
+          en: "Payroll period for this payslip"
+        },
         date: {
           displayFormat: 'MMMM yyyy',
         },
@@ -154,46 +201,149 @@ export const Payslips: CollectionConfig = {
     {
       name: 'payrollDetails',
       type: 'group',
+      label: {
+        ar: "تفاصيل الرواتب",
+        en: "Payroll Details"
+      },
       admin: {
-        description: 'Detailed payroll breakdown',
+        description: {
+          ar: "تفصيل مفصل للرواتب",
+          en: "Detailed payroll breakdown"
+        },
       },
       fields: [
         {
           name: 'basicSalary',
           type: 'number',
+          label: {
+            ar: "الراتب الأساسي",
+            en: "Basic Salary"
+          },
           required: true,
           admin: {
             readOnly: true,
-            description: 'Basic salary amount',
+            description: {
+              ar: "مبلغ الراتب الأساسي",
+              en: "Basic salary amount"
+            },
             step: 0.01,
           },
         },
         {
           name: 'allowances',
           type: 'number',
+          label: {
+            ar: "البدلات",
+            en: "Allowances"
+          },
           defaultValue: 0,
           admin: {
             readOnly: true,
-            description: 'Total allowances',
+            description: {
+              ar: "إجمالي البدلات",
+              en: "Total allowances"
+            },
             step: 0.01,
           },
         },
         {
-          name: 'deductions',
+          name: 'baseDeductions',
           type: 'number',
           defaultValue: 0,
+          label: {
+            en: 'Base Deductions',
+            ar: 'الاستقطاعات الأساسية'
+          },
           admin: {
             readOnly: true,
-            description: 'Total deductions',
+            description: {
+              en: 'Base deductions from employee profile',
+              ar: 'الاستقطاعات الأساسية من ملف الموظف'
+            },
+            step: 0.01,
+          },
+        },
+        {
+          name: 'additionalDeductions',
+          type: 'array',
+          label: {
+            en: 'Additional Deductions',
+            ar: 'الاستقطاعات الإضافية'
+          },
+          admin: {
+            readOnly: true,
+            description: {
+              en: 'Month-specific additional deductions',
+              ar: 'الاستقطاعات الإضافية للشهر المحدد'
+            },
+          },
+          fields: [
+            {
+              name: 'type',
+              type: 'text',
+              label: {
+                en: 'Type',
+                ar: 'النوع'
+              },
+              admin: {
+                readOnly: true,
+              },
+            },
+            {
+              name: 'description',
+              type: 'text',
+              label: {
+                en: 'Description',
+                ar: 'الوصف'
+              },
+              admin: {
+                readOnly: true,
+              },
+            },
+            {
+              name: 'amount',
+              type: 'number',
+              label: {
+                en: 'Amount (SAR)',
+                ar: 'المبلغ (ريال سعودي)'
+              },
+              admin: {
+                readOnly: true,
+                step: 0.01,
+              },
+            },
+          ],
+        },
+        {
+          name: 'totalDeductions',
+          type: 'number',
+          defaultValue: 0,
+          label: {
+            en: 'Total Deductions',
+            ar: 'إجمالي الاستقطاعات'
+          },
+          admin: {
+            readOnly: true,
+            description: {
+              en: 'Total of all deductions (base + additional)',
+              ar: 'إجمالي جميع الاستقطاعات (أساسية + إضافية)'
+            },
             step: 0.01,
           },
         },
         {
           name: 'grossPay',
           type: 'number',
+          label: {
+            ar: "الراتب الإجمالي",
+            en: "Gross Pay"
+          },
           admin: {
             readOnly: true,
-            description: 'Gross pay (Basic + Allowances)',
+            description: {
+              ar: "الراتب الإجمالي (الأساسي + البدلات)",
+              en: "Gross pay (Basic + Allowances)"
+            },
             step: 0.01,
           },
         },
@@ -201,18 +351,32 @@ export const Payslips: CollectionConfig = {
           name: 'netPay',
           type: 'number',
           required: true,
+          label: {
+            en: 'Net Pay',
+            ar: 'صافي الراتب'
+          },
           admin: {
             readOnly: true,
-            description: 'Net pay (Gross - Deductions)',
+            description: {
+              en: 'Net pay (Gross - Total Deductions)',
+              ar: 'صافي الراتب (الإجمالي - إجمالي الاستقطاعات)'
+            },
             step: 0.01,
           },
         },
         {
           name: 'iban',
           type: 'text',
+          label: {
+            ar: "رقم الآيبان",
+            en: "IBAN"
+          },
           admin: {
             readOnly: true,
-            description: 'Employee IBAN for payment',
+            description: {
+              ar: "رقم آيبان الموظف للدفع",
+              en: "Employee IBAN for payment"
+            },
           },
         },
       ],
@@ -220,34 +384,60 @@ export const Payslips: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
+      label: {
+        ar: "الحالة",
+        en: "Status"
+      },
       required: true,
       defaultValue: 'generated',
       options: [
         {
-          label: 'Generated',
+          label: {
+            ar: "مولد",
+            en: "Generated"
+          },
           value: 'generated',
         },
         {
-          label: 'Sent to Employee',
+          label: {
+            ar: "مرسل للموظف",
+            en: "Sent to Employee"
+          },
           value: 'sent',
         },
         {
-          label: 'Downloaded by Employee',
+          label: {
+            ar: "تم تحميله بواسطة الموظف",
+            en: "Downloaded by Employee"
+          },
           value: 'downloaded',
         },
         {
-          label: 'Viewed by Employee',
+          label: {
+            ar: "تمت مشاهدته بواسطة الموظف",
+            en: "Viewed by Employee"
+          },
           value: 'viewed',
         },
       ],
       admin: {
         position: 'sidebar',
-        description: 'Current status of the payslip',
+        description: {
+          ar: "الحالة الحالية لكشف الراتب",
+          en: "Current status of the payslip"
+        },
+        components: {
+          Cell: "/components/client/statusCell"
+        }
       },
     },
     {
       name: 'sentAt',
       type: 'date',
+      label: {
+        ar: "تاريخ الإرسال",
+        en: "Sent At"
+      },
       admin: {
         readOnly: true,
         position: 'sidebar',
@@ -255,12 +445,19 @@ export const Payslips: CollectionConfig = {
         date: {
           displayFormat: 'dd/MM/yyyy HH:mm',
         },
-        description: 'Date when payslip was sent to employee',
+        description: {
+          ar: "تاريخ إرسال كشف الراتب للموظف",
+          en: "Date when payslip was sent to employee"
+        },
       },
     },
     {
       name: 'viewedAt',
       type: 'date',
+      label: {
+        ar: "تاريخ المشاهدة",
+        en: "Viewed At"
+      },
       admin: {
         readOnly: true,
         position: 'sidebar',
@@ -268,33 +465,61 @@ export const Payslips: CollectionConfig = {
         date: {
           displayFormat: 'dd/MM/yyyy HH:mm',
         },
-        description: 'Date when employee viewed/downloaded payslip',
+        description: {
+          ar: "تاريخ مشاهدة/تحميل الموظف لكشف الراتب",
+          en: "Date when employee viewed/downloaded payslip"
+        },
       },
     },
     {
       name: 'pdfGenerated',
       type: 'checkbox',
+      label: {
+        ar: "تم إنشاء PDF",
+        en: "PDF Generated"
+      },
       defaultValue: false,
       admin: {
         readOnly: true,
         position: 'sidebar',
-        description: 'Whether PDF has been generated',
+        description: {
+          ar: "هل تم إنشاء ملف PDF",
+          en: "Whether PDF has been generated"
+        },
       },
     },
     {
       name: 'pdfUrl',
       type: 'text',
+      label: {
+        ar: "رابط PDF",
+        en: "PDF URL"
+      },
       admin: {
         readOnly: true,
         condition: (data) => data?.pdfGenerated,
-        description: 'URL/path to generated PDF',
+        description: {
+          ar: "رابط/مسار ملف PDF المولد",
+          en: "URL/path to generated PDF"
+        },
       },
     },
     {
       name: 'notes',
       type: 'textarea',
+      label: {
+        ar: "ملاحظات",
+        en: "Notes"
+      },
       admin: {
-        description: 'Internal notes about this payslip',
+        description: {
+          ar: "ملاحظات داخلية حول هذا كشف الراتب",
+          en: "Internal notes about this payslip"
+        },
+        placeholder: {
+          ar: "أدخل ملاحظات",
+          en: "Enter notes"
+        },
         position: 'sidebar',
         rows: 3,
       },
