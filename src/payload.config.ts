@@ -37,7 +37,13 @@ export default buildConfig({
     meta: {
       title: "Remoteway",
       description: 'The best admin panel in the world !',
-      titleSuffix: " - Remoteway"
+      titleSuffix: " - Remoteway",
+      openGraph: {
+        description: "Dashboard",
+        siteName: 'Remoteway',
+        title: 'Admin Panel',
+      },
+      robots: 'noindex, nofollow'
     },
     components: {
       graphics: {
