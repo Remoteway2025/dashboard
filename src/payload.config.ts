@@ -36,7 +36,8 @@ export default buildConfig({
     },
     meta: {
       title: "Remoteway",
-      description: 'The best admin panel in the world',
+      description: 'The best admin panel in the world !',
+      titleSuffix: "Remoteway"
     },
     components: {
       graphics: {
