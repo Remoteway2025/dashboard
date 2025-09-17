@@ -8,7 +8,16 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true
-  }
+  },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/admin',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 export default nextConfig

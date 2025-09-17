@@ -74,3 +74,40 @@ export async function getPayslipForEmployeeAndMonth(employeeId: string, monthDat
 
     return result.docs.length > 0 ? result.docs[0] : null
 }
+
+export async function updateCandidateStatus(candidateId: string, status: 'available' | 'assigned' | 'selected' | 'rejected', user?: User) {
+    if (!candidateId || !status) {
+        throw new Error('Candidate ID and status are required')
+    }
+
+    // Validate status value
+    const validStatuses = ['available', 'assigned', 'selected', 'rejected']
+    if (!validStatuses.includes(status)) {
+        throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`)
+    }
+
+    const payload = await getPayload({ config })
+
+    try {
+        const result = await payload.update({
+            collection: 'candidates',
+            id: candidateId,
+            data: {
+                status: status
+            },
+            user,
+            overrideAccess: false // Respect access controls
+        })
+
+        return {
+            success: true,
+            data: result
+        }
+    } catch (error) {
+        console.error('Error updating candidate status:', error)
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to update candidate status'
+        }
+    }
+}

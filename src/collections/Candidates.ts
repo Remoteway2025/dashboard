@@ -102,6 +102,11 @@ export const Candidates: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['avatar', 'name', 'jobTitle', 'status', 'company', 'createdAt'],
     listSearchableFields: ['name', 'jobTitle', 'skills'],
+    components: {
+      edit: {
+        beforeDocumentControls: ["/components/client/CandidateActionButtons"]
+      }
+    }
   },
   timestamps: true,
   trash: true,
@@ -617,20 +622,26 @@ export const Candidates: CollectionConfig = {
           // Handle assignment notification
           if (doc.status === 'assigned' && doc.company && previousDoc.status === 'available') {
             // Create notification for the assigned company
-            await req.payload.create({
+            // Create notification in English
+            const notificationEN = await req.payload.create({
               collection: 'notifications',
+              locale: 'en',
               data: {
-                title: {
-                  en: 'New Candidate Assigned',
-                  ar: 'تم تعيين مرشح جديد'
-                },
-                message: {
-                  en: `A new candidate "${doc.name.en || doc.name}" has been assigned to your company for the position of ${doc.jobTitle.en || doc.jobTitle}`,
-                  ar: `تم تعيين مرشح جديد "${doc.name.ar || doc.name}" لشركتكم لوظيفة ${doc.jobTitle.ar || doc.jobTitle}`
-                },
+                title: 'New Candidate Assigned',
+                message: `A new candidate "${doc.name.en || doc.name}" has been assigned to your company for the position of ${doc.jobTitle.en || doc.jobTitle}`,
                 recipientType: 'specific',
-                recipients: [doc.company],
-                priority: 'high',
+                recipients: [doc.company]
+              },
+            })
+
+            // Update same notification with Arabic locale
+            await req.payload.update({
+              collection: 'notifications',
+              id: notificationEN.id,
+              locale: 'ar',
+              data: {
+                title: 'تم تعيين مرشح جديد',
+                message: `تم تعيين مرشح جديد "${doc.name.ar || doc.name}" لشركتكم لوظيفة ${doc.jobTitle.ar || doc.jobTitle}`
               },
             })
           }
@@ -645,20 +656,27 @@ export const Candidates: CollectionConfig = {
             const companyNameEn = user.company?.companyLegalName?.en || user.company?.companyLegalName || 'company'
             const companyNameAr = user.company?.companyLegalName?.ar || user.company?.companyLegalName || 'الشركة'
 
-            await req.payload.create({
+            // Create notification in English
+            const notificationEN = await req.payload.create({
               collection: 'notifications',
+              locale: 'en',
               data: {
-                title: {
-                  en: `Candidate ${statusTextEn}`,
-                  ar: `${statusTextAr} المرشح`
-                },
-                message: {
-                  en: `Candidate ${doc.name.en || doc.name} has been ${doc.status} by ${companyNameEn}`,
-                  ar: `${statusTextAr} المرشح ${doc.name.ar || doc.name} من قبل ${companyNameAr}`
-                },
+                status: "draft",
+                title: `Candidate ${statusTextEn}`,
+                message: `Candidate ${doc.name.en || doc.name} has been ${doc.status} by ${companyNameEn}`,
                 recipientType: 'specific',
-                recipients: [doc.company],
-                priority: doc.status === 'selected' ? 'high' : 'medium'
+                recipients: [doc.company]
+              },
+            })
+
+            // Update same notification with Arabic locale
+            await req.payload.update({
+              collection: 'notifications',
+              id: notificationEN.id,
+              locale: 'ar',
+              data: {
+                title: `${statusTextAr} المرشح`,
+                message: `${statusTextAr} المرشح ${doc.name.ar || doc.name} من قبل ${companyNameAr}`
               },
             })
           }
