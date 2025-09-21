@@ -68,6 +68,7 @@ export default buildConfig({
           noTrashResults: "لا توجد نتائج في الأرشيف",
           noResults: "لا توجد نتائج ...",
           collapse: "إغلاق",
+          permanentlyDelete: "تجاوز الأرشيف واحذف بشكل دائم"
         }
       },
       en: {
