@@ -64,7 +64,10 @@ export default buildConfig({
           createNew: "إنشاء جديد",
           all: "كل",
           trash: "الأرشيف",
-          noResults: "لا توجد نتائج ..."
+          emptyTrash: "تفريغ الأرشيف",
+          noTrashResults: "لا توجد نتائج في الأرشيف",
+          noResults: "لا توجد نتائج ...",
+          collapse: "إغلاق",
         }
       },
       en: {

@@ -3,8 +3,11 @@ import { Tag } from 'antd';
 import * as _ from "lodash"
 import { useTheme } from '@payloadcms/ui';
 import { DefaultCellComponentProps } from 'payload';
+import { useLocale, useTranslation, useAuth } from '@payloadcms/ui'
 
-function Status({ cellData }:DefaultCellComponentProps) {
+function Status({ cellData }: DefaultCellComponentProps) {
+
+    const { t } = useTranslation()
 
     const tagStyles = {
         backgroundColor: 'transparent',
@@ -61,7 +64,7 @@ function Status({ cellData }:DefaultCellComponentProps) {
 
     return (<>
         <Tag style={tagStyles} color={getColor(cellData)}>
-            {_.startCase(cellData)}
+            {_.startCase(t(cellData))}
         </Tag>
     </>);
 }
