@@ -138,11 +138,24 @@ body {
     --color-accent-900: #540009;
     --color-accent-950: #460007;
 
-    
     --style-radius-l: 19px !important;
 }
 
+.per-page__button:focus-visible, .per-page__button:hover {
+    text-decoration: none;
+}
 
+.popup--active .popup__content {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    border-radius: 10px;
+}
+
+.doc-popup-button-list__button {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+}
 button,
 a,
 .where-builder {
