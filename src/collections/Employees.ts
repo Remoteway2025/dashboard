@@ -168,108 +168,128 @@ export const Employees: CollectionConfig = {
           en: "Company this employee is assigned to"
         },
       },
+      defaultValue: ({ user }) => {
+        if (user?.role === 'employer' && user?.company) {
+          return user.company?.id || user.company
+        }
+        return undefined
+      },
       filterOptions: {
         status: {
           equals: 'active',
         },
       },
+      access: {
+        update: ({ req: { user } }) => user?.role === 'super admin',
+        create: ({ req: { user } }) => user?.role === 'super admin',
+      }
     },
     {
-      name: 'fullName',
-      type: 'text',
-      label: {
-        ar: "الاسم الكامل",
-        en: "Full Name"
-      },
-      required: true,
-      maxLength: 200,
-      localized: true,
-      admin: {
-        placeholder: {
-          ar: "أدخل الاسم الكامل",
-          en: "Enter full name"
+      type: "row",
+      fields: [
+        {
+          name: 'fullName',
+          type: 'text',
+          label: {
+            ar: "الاسم الكامل",
+            en: "Full Name"
+          },
+          required: true,
+          maxLength: 200,
+          localized: true,
+          admin: {
+            placeholder: {
+              ar: "أدخل الاسم الكامل",
+              en: "Enter full name"
+            },
+            description: {
+              ar: "الاسم الكامل للموظف (حتى 200 حرف)",
+              en: "Employee full name (max 200 characters)"
+            },
+          },
         },
-        description: {
-          ar: "الاسم الكامل للموظف (حتى 200 حرف)",
-          en: "Employee full name (max 200 characters)"
+        {
+          name: 'employeeId',
+          type: 'text',
+          label: {
+            ar: "رقم الموظف",
+            en: "Employee ID"
+          },
+          required: true,
+          maxLength: 50,
+          admin: {
+            placeholder: {
+              ar: "أدخل رقم الموظف",
+              en: "Enter employee ID"
+            },
+            description: {
+              ar: "رقم موظف فريد داخل الشركة",
+              en: "Unique employee ID within the company"
+            },
+          },
         },
-      },
+      ]
     },
     {
-      name: 'employeeId',
-      type: 'text',
-      label: {
-        ar: "رقم الموظف",
-        en: "Employee ID"
-      },
-      required: true,
-      maxLength: 50,
-      admin: {
-        placeholder: {
-          ar: "أدخل رقم الموظف",
-          en: "Enter employee ID"
-        },
-        description: {
-          ar: "رقم موظف فريد داخل الشركة",
-          en: "Unique employee ID within the company"
-        },
-      },
-    },
-    {
-      name: 'nationalId',
-      type: 'text',
-      label: {
-        ar: "رقم الهوية",
-        en: "National ID"
-      },
-      required: true,
-      admin: {
-        placeholder: {
-          ar: "أدخل رقم الهوية أو الإقامة",
-          en: "Enter National ID or Iqama number"
-        },
-        description: {
-          ar: "رقم الهوية أو الإقامة (10-15 رقم)",
-          en: "National ID or Iqama number (10-15 digits)"
-        },
-      },
-      validate: (value) => {
-        if (!value || value.trim() === '') {
-          return 'National ID/Iqama number is required.'
-        }
+      type: "row",
+      fields: [
+        {
+          name: 'nationalId',
+          type: 'text',
+          label: {
+            ar: "رقم الهوية",
+            en: "National ID"
+          },
+          required: true,
+          admin: {
+            placeholder: {
+              ar: "أدخل رقم الهوية أو الإقامة",
+              en: "Enter National ID or Iqama number"
+            },
+            description: {
+              ar: "رقم الهوية أو الإقامة (10-15 رقم)",
+              en: "National ID or Iqama number (10-15 digits)"
+            },
+          },
+          validate: (value) => {
+            if (!value || value.trim() === '') {
+              return 'National ID/Iqama number is required.'
+            }
 
-        // Remove any spaces or dashes
-        const cleanedId = value.replace(/[\s-]/g, '')
+            // Remove any spaces or dashes
+            const cleanedId = value.replace(/[\s-]/g, '')
 
-        // Check if it's numeric and between 10-15 digits
-        const idRegex = /^\d{10,15}$/
-        if (!idRegex.test(cleanedId)) {
-          return 'National ID/Iqama must be 10-15 digits only.'
-        }
+            // Check if it's numeric and between 10-15 digits
+            const idRegex = /^\d{10,15}$/
+            if (!idRegex.test(cleanedId)) {
+              return 'National ID/Iqama must be 10-15 digits only.'
+            }
 
-        return true
-      },
-    },
-    {
-      name: 'jobTitle',
-      type: 'text',
-      label: {
-        ar: "المسمى الوظيفي",
-        en: "Job Title"
-      },
-      required: true,
-      maxLength: 100,
-      localized: true,
-      admin: {
-        placeholder: {
-          ar: "أدخل المسمى الوظيفي",
-          en: "Enter job title/position"
+            return true
+          },
         },
-        description: {
-          ar: "المسمى الوظيفي أو المنصب",
-          en: "Employee job title or position"
+        {
+          name: 'jobTitle',
+          type: 'text',
+          label: {
+            ar: "المسمى الوظيفي",
+            en: "Job Title"
+          },
+          required: true,
+          maxLength: 100,
+          localized: true,
+          admin: {
+            placeholder: {
+              ar: "أدخل المسمى الوظيفي",
+              en: "Enter job title/position"
+            },
+            description: {
+              ar: "المسمى الوظيفي أو المنصب",
+              en: "Employee job title or position"
+            },
+          },
         },
-      },
+      ]
     },
     {
       name: 'contractInfo',
@@ -286,67 +306,72 @@ export const Employees: CollectionConfig = {
       },
       fields: [
         {
-          name: 'startDate',
-          type: 'date',
-          label: {
-            ar: "تاريخ بداية العقد",
-            en: "Start Date"
-          },
-          required: true,
-          admin: {
-            description: {
-              ar: "تاريخ بداية العقد (لا يزيد عن 30 يوم في المستقبل)",
-              en: "Contract start date (not more than 30 days in future)"
+          type: "row",
+          fields: [
+            {
+              name: 'startDate',
+              type: 'date',
+              label: {
+                ar: "تاريخ بداية العقد",
+                en: "Start Date"
+              },
+              required: true,
+              admin: {
+                description: {
+                  ar: "تاريخ بداية العقد (لا يزيد عن 30 يوم في المستقبل)",
+                  en: "Contract start date (not more than 30 days in future)"
+                },
+                date: {
+                  displayFormat: 'dd/MM/yyyy',
+                },
+              },
+              validate: (value) => {
+                if (!value) {
+                  return 'Contract start date is required.'
+                }
+
+                const startDate = new Date(value)
+                const today = new Date()
+                const thirtyDaysFromNow = new Date()
+                thirtyDaysFromNow.setDate(today.getDate() + 30)
+
+                if (startDate > thirtyDaysFromNow) {
+                  return 'Contract start date cannot be more than 30 days in the future.'
+                }
+
+                return true
+              },
             },
-            date: {
-              displayFormat: 'dd/MM/yyyy',
-            },
-          },
-          validate: (value) => {
-            if (!value) {
-              return 'Contract start date is required.'
+            {
+              name: 'endDate',
+              type: 'date',
+              label: {
+                ar: "تاريخ نهاية العقد",
+                en: "End Date"
+              },
+              admin: {
+                description: {
+                  ar: "تاريخ نهاية العقد (اختياري)",
+                  en: "Contract end date (optional, must be after start date)"
+                },
+                date: {
+                  minDate: dayjs().toDate(),
+                  displayFormat: 'dd/MM/yyyy',
+                },
+              },
+              validate: (value, { data }) => {
+                if (value && data?.contractInfo?.startDate) {
+                  const startDate = new Date(data.contractInfo.startDate)
+                  const endDate = new Date(value)
+
+                  if (endDate <= startDate) {
+                    return 'Contract end date must be after start date.'
+                  }
+                }
+                return true
+              },
             }
-
-            const startDate = new Date(value)
-            const today = new Date()
-            const thirtyDaysFromNow = new Date()
-            thirtyDaysFromNow.setDate(today.getDate() + 30)
-
-            if (startDate > thirtyDaysFromNow) {
-              return 'Contract start date cannot be more than 30 days in the future.'
-            }
-
-            return true
-          },
-        },
-        {
-          name: 'endDate',
-          type: 'date',
-          label: {
-            ar: "تاريخ نهاية العقد",
-            en: "End Date"
-          },
-          admin: {
-            description: {
-              ar: "تاريخ نهاية العقد (اختياري)",
-              en: "Contract end date (optional, must be after start date)"
-            },
-            date: {
-              minDate: dayjs().toDate(),
-              displayFormat: 'dd/MM/yyyy',
-            },
-          },
-          validate: (value, { data }) => {
-            if (value && data?.contractInfo?.startDate) {
-              const startDate = new Date(data.contractInfo.startDate)
-              const endDate = new Date(value)
-
-              if (endDate <= startDate) {
-                return 'Contract end date must be after start date.'
-              }
-            }
-            return true
-          },
+          ]
         },
         {
           name: 'autoRenew',
@@ -526,44 +551,49 @@ export const Employees: CollectionConfig = {
       },
       fields: [
         {
-          name: 'email',
-          type: 'email',
-          label: {
-            ar: "البريد الإلكتروني",
-            en: "Email"
-          },
-          admin: {
-            placeholder: 'employee@company.com',
-            description: {
-              ar: "عنوان البريد الإلكتروني للموظف",
-              en: "Employee email address"
+          type: "row",
+          fields: [
+            {
+              name: 'email',
+              type: 'email',
+              label: {
+                ar: "البريد الإلكتروني",
+                en: "Email"
+              },
+              admin: {
+                placeholder: 'employee@company.com',
+                description: {
+                  ar: "عنوان البريد الإلكتروني للموظف",
+                  en: "Employee email address"
+                },
+              },
             },
-          },
-        },
-        {
-          name: 'phone',
-          type: 'text',
-          label: {
-            ar: "رقم الهاتف",
-            en: "Phone"
-          },
-          admin: {
-            placeholder: '+966501234567',
-            description: {
-              ar: "رقم هاتف الموظف",
-              en: "Employee phone number"
-            },
-          },
-          validate: (value) => {
-            if (value) {
-              const cleanedPhone = value.replace(/[\s-]/g, '')
-              const phoneRegex = /^\+?\d{9,15}$/
-              if (!phoneRegex.test(cleanedPhone)) {
-                return 'Please enter a valid phone number (9-15 digits).'
-              }
+            {
+              name: 'phone',
+              type: 'text',
+              label: {
+                ar: "رقم الهاتف",
+                en: "Phone"
+              },
+              admin: {
+                placeholder: '+966501234567',
+                description: {
+                  ar: "رقم هاتف الموظف",
+                  en: "Employee phone number"
+                },
+              },
+              validate: (value) => {
+                if (value) {
+                  const cleanedPhone = value.replace(/[\s-]/g, '')
+                  const phoneRegex = /^\+?\d{9,15}$/
+                  if (!phoneRegex.test(cleanedPhone)) {
+                    return 'Please enter a valid phone number (9-15 digits).'
+                  }
+                }
+                return true
+              },
             }
-            return true
-          },
+          ]
         },
       ],
     },

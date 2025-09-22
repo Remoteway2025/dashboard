@@ -128,76 +128,78 @@ export const Candidates: CollectionConfig = {
       access: adminOnlyUpdateAccess,
     },
     {
-      name: 'name',
-      label: {
-        ar: "الإسم",
-        en: "Name"
-      },
-      type: 'text',
-      required: true,
-      localized: true,
-      admin: {
-        placeholder: { en: 'Full name', ar: 'الإسم كامل' },
-      },
-      access: adminOnlyUpdateAccess,
-    },
-    {
-      name: 'jobTitle',
-      type: 'text',
-      label: {
-        ar: "المسمى الوظيفي",
-        en: "Job Title"
-      },
-      required: true,
-      localized: true,
-      admin: {
-        placeholder: 'e.g., Senior Software Engineer',
-        description: { en: 'Desired or current job title', ar: "المسمى الوظيفي الحالي" },
-      },
-      access: adminOnlyUpdateAccess,
+      type: "row",
+      fields: [
+        {
+          name: 'name',
+          label: {
+            ar: "الإسم",
+            en: "Name"
+          },
+          type: 'text',
+          required: true,
+          localized: true,
+          admin: {
+            placeholder: { en: 'Full name', ar: 'الإسم كامل' },
+          },
+          access: adminOnlyUpdateAccess,
+        },
+        {
+          name: 'jobTitle',
+          type: 'text',
+          label: {
+            ar: "المسمى الوظيفي",
+            en: "Job Title"
+          },
+          required: true,
+          localized: true,
+          admin: {
+            placeholder: 'e.g., Senior Software Engineer',
+            description: { en: 'Desired or current job title', ar: "المسمى الوظيفي الحالي" },
+          },
+          access: adminOnlyUpdateAccess,
+        },
+      ]
     },
     {
       name: 'employmentPreferences',
-      type: 'group',
+      type: 'radio',
       label: {
         en: 'Employment Preferences',
         ar: 'تفضيلات التوظيف'
       },
-      admin: {
-        description: {
-          en: 'Employment type preferences',
-          ar: 'تفضيلات نوع التوظيف'
-        },
-      },
-      fields: [
+      required: true,
+      defaultValue: 'fullTime',
+      options: [
         {
-          name: 'fullTime',
-          type: 'checkbox',
-          defaultValue: true,
           label: {
             en: 'Full-time',
             ar: 'دوام كامل'
           },
+          value: 'fullTime',
         },
         {
-          name: 'partTime',
-          type: 'checkbox',
-          defaultValue: false,
           label: {
             en: 'Part-time',
             ar: 'دوام جزئي'
           },
+          value: 'partTime',
         },
         {
-          name: 'both',
-          type: 'checkbox',
-          defaultValue: false,
           label: {
             en: 'Both (Flexible)',
             ar: 'كلاهما (مرن)'
           },
+          value: 'both',
         },
       ],
+      admin: {
+        layout: 'horizontal',
+        description: {
+          en: 'Select preferred employment type',
+          ar: 'اختر نوع التوظيف المفضل'
+        },
+      },
       access: adminOnlyUpdateAccess,
     },
     {
@@ -380,85 +382,96 @@ export const Candidates: CollectionConfig = {
       },
       fields: [
         {
-          name: 'language',
-          type: 'select',
-          label: {
-            en: 'Language',
-            ar: 'اللغة'
-          },
-          required: true,
-          options: [
-            { label: { en: 'Arabic', ar: 'العربية' }, value: 'arabic' },
-            { label: { en: 'English', ar: 'الإنجليزية' }, value: 'english' },
-            { label: { en: 'French', ar: 'الفرنسية' }, value: 'french' },
-            { label: { en: 'Spanish', ar: 'الإسبانية' }, value: 'spanish' },
-            { label: { en: 'German', ar: 'الألمانية' }, value: 'german' },
-            { label: { en: 'Hindi', ar: 'الهندية' }, value: 'hindi' },
-            { label: { en: 'Urdu', ar: 'الأردية' }, value: 'urdu' },
-            { label: { en: 'Bengali', ar: 'البنغالية' }, value: 'bengali' },
-            { label: { en: 'Chinese', ar: 'الصينية' }, value: 'chinese' },
-            { label: { en: 'Other', ar: 'أخرى' }, value: 'other' },
-          ],
-        },
-        {
-          name: 'fluencyLevel',
-          type: 'select',
-          label: {
-            en: 'Fluency Level',
-            ar: 'مستوى الطلاقة'
-          },
-          required: true,
-          options: [
-            { label: { en: 'Native', ar: 'لغة أم' }, value: 'native' },
-            { label: { en: 'Fluent', ar: 'طلق' }, value: 'fluent' },
-            { label: { en: 'Advanced', ar: 'متقدم' }, value: 'advanced' },
-            { label: { en: 'Intermediate', ar: 'متوسط' }, value: 'intermediate' },
-            { label: { en: 'Basic', ar: 'أساسي' }, value: 'basic' },
-          ],
-        },
+          type: "row",
+          fields: [
+            {
+              name: 'language',
+              type: 'select',
+              label: {
+                en: 'Language',
+                ar: 'اللغة'
+              },
+              required: true,
+              options: [
+                { label: { en: 'Arabic', ar: 'العربية' }, value: 'arabic' },
+                { label: { en: 'English', ar: 'الإنجليزية' }, value: 'english' },
+                { label: { en: 'French', ar: 'الفرنسية' }, value: 'french' },
+                { label: { en: 'Spanish', ar: 'الإسبانية' }, value: 'spanish' },
+                { label: { en: 'German', ar: 'الألمانية' }, value: 'german' },
+                { label: { en: 'Hindi', ar: 'الهندية' }, value: 'hindi' },
+                { label: { en: 'Urdu', ar: 'الأردية' }, value: 'urdu' },
+                { label: { en: 'Bengali', ar: 'البنغالية' }, value: 'bengali' },
+                { label: { en: 'Chinese', ar: 'الصينية' }, value: 'chinese' },
+                { label: { en: 'Other', ar: 'أخرى' }, value: 'other' },
+              ],
+            },
+            {
+              name: 'fluencyLevel',
+              type: 'select',
+              label: {
+                en: 'Fluency Level',
+                ar: 'مستوى الطلاقة'
+              },
+              required: true,
+              options: [
+                { label: { en: 'Native', ar: 'لغة أم' }, value: 'native' },
+                { label: { en: 'Fluent', ar: 'طلق' }, value: 'fluent' },
+                { label: { en: 'Advanced', ar: 'متقدم' }, value: 'advanced' },
+                { label: { en: 'Intermediate', ar: 'متوسط' }, value: 'intermediate' },
+                { label: { en: 'Basic', ar: 'أساسي' }, value: 'basic' },
+              ],
+            }
+          ]
+        }
       ],
       access: adminOnlyUpdateAccess,
     },
     {
-      name: 'nationality',
-      type: 'select',
-      label: {
-        en: 'Nationality',
-        ar: 'الجنسية'
-      },
-      required: true,
-      options: nationalities.map(nat => ({
-        label: nat,
-        value: nat.en.toLowerCase().replace(/\s/g, '_'),
-      })),
-      admin: {
-        placeholder: {
-          en: 'Select nationality',
-          ar: 'اختر الجنسية'
+      type: "row",
+      fields: [
+        {
+          name: 'nationality',
+          type: 'select',
+          label: {
+            en: 'Nationality',
+            ar: 'الجنسية'
+          },
+          required: true,
+          options: nationalities.map(nat => ({
+            label: nat,
+            value: nat.en.toLowerCase().replace(/\s/g, '_'),
+          })),
+          admin: {
+            placeholder: {
+              en: 'Select nationality',
+              ar: 'اختر الجنسية'
+            },
+          },
+          access: adminOnlyUpdateAccess,
         },
-      },
-      access: adminOnlyUpdateAccess,
-    },
-    {
-      name: 'country',
-      type: 'select',
-      label: {
-        en: 'Country',
-        ar: 'البلد'
-      },
-      required: true,
-      options: countries.map(country => ({
-        label: country,
-        value: country.en.toLowerCase().replace(/\s/g, '_'),
-      })),
-      admin: {
-        placeholder: {
-          en: 'Current country of residence',
-          ar: 'بلد الإقامة الحالي'
+        {
+          name: 'country',
+          type: 'select',
+          label: {
+            en: 'Country',
+            ar: 'البلد'
+          },
+          required: true,
+          options: countries.map(country => ({
+            label: country,
+            value: country.en.toLowerCase().replace(/\s/g, '_'),
+          })),
+          admin: {
+            placeholder: {
+              en: 'Current country of residence',
+              ar: 'بلد الإقامة الحالي'
+            },
+          },
+          access: adminOnlyUpdateAccess,
         },
-      },
-      access: adminOnlyUpdateAccess,
+      ]
     },
+
     {
       name: 'status',
       type: 'select',

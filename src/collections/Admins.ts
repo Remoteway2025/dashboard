@@ -51,88 +51,98 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
-      name: 'role',
-      type: 'select',
-      label: {
-        ar: "الدور",
-        en: "Role"
-      },
-      required: true,
-      options: [
+      type: "row",
+      fields: [
         {
+          name: 'role',
+          type: 'select',
           label: {
-            ar: "مدير عام",
-            en: "Super Admin"
+            ar: "الدور",
+            en: "Role"
           },
-          value: 'super admin',
+          required: true,
+          options: [
+            {
+              label: {
+                ar: "مدير عام",
+                en: "Super Admin"
+              },
+              value: 'super admin',
+            },
+            {
+              label: {
+                ar: "صاحب عمل",
+                en: "Employer"
+              },
+              value: 'employer',
+            },
+          ],
+          access: {
+            update: ({ req: { user } }) => user?.role === 'super admin'
+          }
         },
         {
+          name: 'company',
+          type: 'relationship',
           label: {
-            ar: "صاحب عمل",
-            en: "Employer"
+            ar: "الشركة",
+            en: "Company"
           },
-          value: 'employer',
+          relationTo: 'companies',
+          required: true,
+          admin: {
+            condition: (data) => data?.role === 'employer',
+            description: {
+              ar: "الشركة التي ينتمي إليها هذا المستخدم",
+              en: "The company this user belongs to"
+            },
+          },
+          validate: (value, { data }) => {
+            if (data?.role === 'employer' && !value) {
+              return 'Company is required for employer users.'
+            }
+            return true
+          },
+          access: {
+            update: ({ req: { user } }) => user?.role === 'super admin'
+          }
         },
-      ],
-      access: {
-        update: ({ req: { user } }) => user?.role === 'super admin'
-      }
+      ]
     },
     {
-      name: 'company',
-      type: 'relationship',
-      label: {
-        ar: "الشركة",
-        en: "Company"
-      },
-      relationTo: 'companies',
-      required: true,
-      admin: {
-        condition: (data) => data?.role === 'employer',
-        description: {
-          ar: "الشركة التي ينتمي إليها هذا المستخدم",
-          en: "The company this user belongs to"
+      type: "row",
+      fields: [
+        {
+          name: 'firstName',
+          type: 'text',
+          label: {
+            ar: "الاسم الأول",
+            en: "First Name"
+          },
+          localized: true,
+          admin: {
+            placeholder: {
+              ar: "الاسم الأول",
+              en: "First name"
+            },
+          },
         },
-      },
-      validate: (value, { data }) => {
-        if (data?.role === 'employer' && !value) {
-          return 'Company is required for employer users.'
-        }
-        return true
-      },
-      access: {
-        update: ({ req: { user } }) => user?.role === 'super admin'
-      }
-    },
-    {
-      name: 'firstName',
-      type: 'text',
-      label: {
-        ar: "الاسم الأول",
-        en: "First Name"
-      },
-      localized: true,
-      admin: {
-        placeholder: {
-          ar: "الاسم الأول",
-          en: "First name"
+        {
+          name: 'lastName',
+          type: 'text',
+          label: {
+            ar: "الاسم الأخير",
+            en: "Last Name"
+          },
+          localized: true,
+          admin: {
+            placeholder: {
+              ar: "الاسم الأخير",
+              en: "Last name"
+            },
+          },
         },
-      },
-    },
-    {
-      name: 'lastName',
-      type: 'text',
-      label: {
-        ar: "الاسم الأخير",
-        en: "Last Name"
-      },
-      localized: true,
-      admin: {
-        placeholder: {
-          ar: "الاسم الأخير",
-          en: "Last name"
-        },
-      },
+      ]
     },
   ],
 }

@@ -68,12 +68,15 @@ export default buildConfig({
           noTrashResults: "لا توجد نتائج في الأرشيف",
           noResults: "لا توجد نتائج ...",
           collapse: "إغلاق",
-          permanentlyDelete: "تجاوز الأرشيف واحذف بشكل دائم"
+          permanentlyDelete: "تجاوز الأرشيف واحذف بشكل دائم",
+          payloadSettings: "الإعدادات"
         }
       },
       en: {
         general: {
-          trash: "Archive"
+          trash: "Archive",
+          payloadSettings: "Settings"
+
         }
       }
     }
