@@ -50,8 +50,9 @@ export default buildConfig({
         Logo: "/components/client/logo",
         Icon: "/components/client/icon"
       },
-      beforeNavLinks: "/components/client/logo",
-    }
+      beforeNavLinks: ["/components/client/logo"],
+    },
+    avatar: "default"
   },
   i18n: {
     supportedLanguages: { en, ar },
@@ -97,6 +98,9 @@ export default buildConfig({
     ],
     defaultLocale: 'en', // required
     fallback: true, // defaults to true
+  },
+  hooks: {
+    afterError: [(args) => console.log(args)]
   },
   collections: [
     Users,
