@@ -23,7 +23,7 @@ export const Companies: CollectionConfig = {
   },
   labels: {
     singular: {
-      ar: "الشركة",
+      ar: "شركة",
       en: "Company"
     },
     plural: {

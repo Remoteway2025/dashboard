@@ -21,7 +21,7 @@ export const PayrollRequests: CollectionConfig = {
     },
   },
   versions: {
-    drafts: false
+    drafts: false,
   },
   timestamps: true,
   access: {
@@ -60,6 +60,7 @@ export const PayrollRequests: CollectionConfig = {
       if (!user) return false
       return user.role === 'super admin'
     },
+    readVersions: ({ req: { user } }) => user?.role == "super admin"
   },
   hooks: {
     beforeChange: [

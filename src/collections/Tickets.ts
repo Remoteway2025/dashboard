@@ -120,12 +120,34 @@ export const Tickets: CollectionConfig = {
           },
           relationTo: 'companies',
           required: true,
+          defaultValue: ({ user }) => {
+            // If user is an employer, default to their company
+            if (user?.role === 'employer' && user?.company) {
+              return typeof user.company === 'object' ? user.company.id : user.company
+            }
+            return undefined
+          },
           admin: {
             description: {
               ar: "الشركة التي أنشأت هذه التذكرة",
               en: "The company that created this ticket"
-            },
+            }
           },
+          hooks: {
+            beforeChange: [
+              ({ value, req }) => {
+
+                if (req.user?.role === 'employer' && req.user?.company) {
+                  return req.user.company?.id || req.user.company
+                }
+
+                return value
+              }
+            ]
+          },
+          access: {
+            update: ({ req: { user } }) => user?.role === 'super admin'
+          }
         },
         {
           name: 'subject',
@@ -200,7 +222,6 @@ export const Tickets: CollectionConfig = {
             ar: "الأولوية",
             en: "Priority"
           },
-          required: true,
           options: [
             {
               label: {

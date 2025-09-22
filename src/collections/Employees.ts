@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import type { CollectionConfig } from 'payload'
 
 export const Employees: CollectionConfig = {
@@ -55,6 +56,7 @@ export const Employees: CollectionConfig = {
       if (!user) return false
       return user.role === 'super admin'
     },
+    readVersions: ({ req: { user } }) => user?.role == "super admin"
   },
   hooks: {
     beforeValidate: [
@@ -326,10 +328,11 @@ export const Employees: CollectionConfig = {
           },
           admin: {
             description: {
-              ar: "تاريخ نهاية العقد (اختياري، يجب أن يكون بعد تاريخ البداية)",
+              ar: "تاريخ نهاية العقد (اختياري)",
               en: "Contract end date (optional, must be after start date)"
             },
             date: {
+              minDate: dayjs().toDate(),
               displayFormat: 'dd/MM/yyyy',
             },
           },

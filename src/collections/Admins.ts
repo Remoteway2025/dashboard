@@ -74,6 +74,9 @@ export const Users: CollectionConfig = {
           value: 'employer',
         },
       ],
+      access: {
+        update: ({ req: { user } }) => user?.role === 'super admin'
+      }
     },
     {
       name: 'company',
@@ -97,6 +100,9 @@ export const Users: CollectionConfig = {
         }
         return true
       },
+      access: {
+        update: ({ req: { user } }) => user?.role === 'super admin'
+      }
     },
     {
       name: 'firstName',

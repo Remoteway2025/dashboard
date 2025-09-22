@@ -1,0 +1,5 @@
+supportedArchitectures:
+  os:
+  - win32
+  cpu:
+  - x64
