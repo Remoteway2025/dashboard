@@ -146,7 +146,8 @@ export const Tickets: CollectionConfig = {
             ]
           },
           access: {
-            update: ({ req: { user } }) => user?.role === 'super admin'
+            update: ({ req: { user } }) => user?.role === 'super admin',
+            create: ({ req: { user } }) => user?.role === 'super admin'
           }
         },
         {
