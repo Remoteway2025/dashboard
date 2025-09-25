@@ -522,6 +522,11 @@ export const Candidates: CollectionConfig = {
           ar: 'الشركة المُسند إليها المرشح'
         },
       },
+      filterOptions: {
+        status: {
+          equals: 'active',
+        },
+      },
       access: {
         read: ({ req }) => {
 

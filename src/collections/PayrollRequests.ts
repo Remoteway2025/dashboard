@@ -90,13 +90,12 @@ export const PayrollRequests: CollectionConfig = {
 
                 // Calculate amounts for each deduction
                 for (const deduction of empDeduction.deductions) {
+
                   if (deduction.type === 'gosi_percentage' && deduction.gosiPercentage !== undefined) {
+
                     deduction.calculatedAmount = Number((basicSalary * (deduction.gosiPercentage / 100)).toFixed(2))
+
                   } else if (deduction.type === 'fixed_amount' && deduction.fixedAmount !== undefined) {
-                    // Validate that fixed amount doesn't exceed basic salary
-                    if (deduction.fixedAmount > basicSalary) {
-                      throw new Error(`Fixed deduction amount (${deduction.fixedAmount}) cannot exceed basic salary (${basicSalary}) for employee ${employee.fullName}`)
-                    }
                     deduction.calculatedAmount = deduction.fixedAmount
                   }
                 }
@@ -374,6 +373,41 @@ export const PayrollRequests: CollectionConfig = {
           ar: 'استقطاعات إضافية للموظفين المحددين هذا الشهر (حد أقصى 50 موظف لضمان الأداء الأمثل)'
         },
         condition: (data) => data?.company, // Only show when company is selected
+      },
+      validate: async (value, { req }) => {
+        if (!value || !Array.isArray(value)) return true
+
+        const payload = req.payload
+
+        for (const empDeduction of value) {
+          if (empDeduction.employee && empDeduction.deductions) {
+            try {
+              // Fetch employee to get basic salary
+              const employee = await payload.findByID({
+                collection: 'employees',
+                id: empDeduction.employee,
+              })
+
+              if (employee?.payrollInfo?.basicSalary) {
+                const basicSalary = employee.payrollInfo.basicSalary
+
+                for (const deduction of empDeduction.deductions) {
+                  if (deduction.type === 'fixed_amount' && deduction.fixedAmount !== undefined) {
+                    if (deduction.fixedAmount > basicSalary) {
+                      return req.locale === 'ar'
+                        ? `مبلغ الاستقطاع الثابت (${deduction.fixedAmount} ريال) لا يمكن أن يتجاوز الراتب الأساسي (${basicSalary} ريال) للموظف ${employee.fullName}`
+                        : `Fixed deduction amount (${deduction.fixedAmount} SAR) cannot exceed basic salary (${basicSalary} SAR) for employee ${employee.fullName}`
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error validating employeeDeductions:', error)
+            }
+          }
+        }
+
+        return true
       },
       fields: [
         {

@@ -70,7 +70,10 @@ export default buildConfig({
           noResults: "لا توجد نتائج ...",
           collapse: "إغلاق",
           permanentlyDelete: "تجاوز الأرشيف واحذف بشكل دائم",
-          payloadSettings: "الإعدادات"
+          payloadSettings: "الإعدادات",
+          aboutToTrash: 'You are about to move the {{label}} <1>{{title}}</1> to the Archive. Are you sure?',
+          aboutToTrashCount: 'You are about to move {{count}} {{label}} to the Archive',
+          aboutToPermanentlyDeleteTrash: 'You are about to permanently delete <0>{{count}}</0> <1>{{label}}</1> from the Archive. Are you sure?',
         }
       },
       en: {

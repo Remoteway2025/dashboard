@@ -422,13 +422,9 @@ export interface Candidate {
    */
   jobTitle: string;
   /**
-   * Employment type preferences
+   * Select preferred employment type
    */
-  employmentPreferences?: {
-    fullTime?: boolean | null;
-    partTime?: boolean | null;
-    both?: boolean | null;
-  };
+  employmentPreferences: 'fullTime' | 'partTime' | 'both';
   /**
    * Basic salary expectation (SAR)
    */
@@ -927,7 +923,7 @@ export interface Ticket {
   /**
    * Priority level of the ticket
    */
-  priority: 'low' | 'medium' | 'high';
+  priority?: ('low' | 'medium' | 'high') | null;
   /**
    * Current status of the ticket
    */
@@ -1545,13 +1541,7 @@ export interface CandidatesSelect<T extends boolean = true> {
   avatar?: T;
   name?: T;
   jobTitle?: T;
-  employmentPreferences?:
-    | T
-    | {
-        fullTime?: T;
-        partTime?: T;
-        both?: T;
-      };
+  employmentPreferences?: T;
   basicSalary?: T;
   experiences?:
     | T
